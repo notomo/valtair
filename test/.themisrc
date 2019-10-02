@@ -1,0 +1,16 @@
+
+call themis#option('recursive', 1)
+
+let s:root = getcwd()
+
+function! ValtairTestBeforeEach() abort
+    execute 'cd' s:root
+
+    call valtair#logger#set_func({ msg -> themis#log(msg) })
+    call themis#log('')
+endfunction
+
+function! ValtairTestAfterEach() abort
+    silent! %bwipeout!
+    call valtair#logger#clear()
+endfunction
