@@ -8,6 +8,7 @@ function! valtair#tile#new(item) abort
     let lines = ['', space . a:item, '']
     call nvim_buf_set_lines(bufnr, 0, -1, v:true, lines)
     call nvim_buf_set_option(bufnr, 'modifiable', v:false)
+    call nvim_buf_set_option(bufnr, 'filetype', 'valtair')
     call nvim_buf_set_var(bufnr, '&scrolloff', 0)
     call nvim_buf_set_var(bufnr, '&sidescrolloff', 0)
 
