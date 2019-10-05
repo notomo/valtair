@@ -1,29 +1,52 @@
 
 let s:id = 0
 
-function! valtair#collector#new(event_service) abort
+function! valtair#collector#new(event_service, impl) abort
     let s:id += 1
 
     let collector = {
         \ 'id': s:id,
-        \ 'job': valtair#job#new(['ls', '-1'], a:event_service),
         \ 'event_service': a:event_service,
+        \ 'impl': a:impl,
         \ 'items': [],
     \ }
 
     function! collector.start() abort
-        call self.event_service.on_job_finished(self.job.id, { id -> self.on_job_finished(id) })
-        call self.job.start()
+        if !has_key(self.impl, 'job')
+            let self.items = self.impl.items()
+            call self.event_service.collector_finished(self.id)
+            return
+        endif
+
+        let job = self.impl.job
+        call self.event_service.on_job_finished(job.id, { id -> self.on_job_finished(id) })
+        call job.start()
     endfunction
 
     function! collector.on_job_finished(id) abort
-        let self.items = self.job.stdout
+        let self.items = self.impl.items()
         call self.event_service.collector_finished(self.id)
     endfunction
 
     function! collector.wait(timeout_msec) abort
-        call self.job.wait(a:timeout_msec)
+        if !has_key(self.impl, 'job')
+            return
+        endif
+        call self.impl.job.wait(a:timeout_msec)
     endfunction
 
     return collector
+endfunction
+
+let s:directory = expand('<sfile>:p:h') . '/collector'
+
+function! valtair#collector#get_impl(event_service, collector_options) abort
+    let name = a:collector_options.name
+    let path = printf('%s/%s.vim', s:directory, name)
+    if !filereadable(path)
+        throw printf('collector not found: %s', name)
+    endif
+
+    let func = printf('valtair#collector#%s#new', name)
+    return call(func, [a:event_service, a:collector_options.options])
 endfunction

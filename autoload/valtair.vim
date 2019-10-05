@@ -2,9 +2,11 @@
 let s:arranger = valtair#arranger#new()
 
 function! valtair#main(args) abort
-    let event_service = valtair#event#service()
+    let options = valtair#option#parse(a:args)
 
-    let collector = valtair#collector#new(event_service)
+    let event_service = valtair#event#service()
+    let collector_impl = valtair#collector#get_impl(event_service, options.collector)
+    let collector = valtair#collector#new(event_service, collector_impl)
 
     let command = valtair#command#new(collector, s:arranger, event_service)
     call command.start()
