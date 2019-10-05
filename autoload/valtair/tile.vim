@@ -34,6 +34,7 @@ function! valtair#tile#new(item) abort
 
     function! tile.enter() abort
         call nvim_set_current_win(self.window)
+        call nvim_win_set_cursor(self.window, [2, 0])
 
         " FIXME: could not disable CursorLine, CursorColumn highlight
         call nvim_win_set_option(self.window, 'cursorline', v:false)
