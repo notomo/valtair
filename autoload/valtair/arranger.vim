@@ -7,12 +7,31 @@ function! valtair#arranger#new(impl) abort
     \ }
 
     function! arranger.open_tiles(texts) abort
-        let items = self.impl.items(a:texts)
+        let lines = []
+        let line_numbers = []
+        let i = 0
+        for text in a:texts
+            let i += 2
+            let space = repeat(' ', (self.impl.width - strlen(text)) / 2)
+            call extend(lines, ['', space . text])
+            call add(line_numbers, i)
+        endfor
+        call add(lines, '')
+
+        let bufnr = nvim_create_buf(v:false, v:true)
+        call nvim_buf_set_lines(bufnr, 0, -1, v:true, lines)
+        call nvim_buf_set_option(bufnr, 'modifiable', v:false)
+        call nvim_buf_set_option(bufnr, 'filetype', 'valtair')
+        call nvim_buf_set_option(bufnr, 'bufhidden', 'wipe')
+        call nvim_buf_set_var(bufnr, '&scrolloff', 0)
+        call nvim_buf_set_var(bufnr, '&sidescrolloff', 0)
+
+        let items = self.impl.items(line_numbers)
         if empty(items)
             return
         endif
 
-        let self.tiles = map(items, { _, item -> valtair#tile#new(item) })
+        let self.tiles = map(items, { _, item -> valtair#tile#new(item, bufnr) })
 
         for tile in self.tiles
             call tile.open()

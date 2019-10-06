@@ -7,7 +7,7 @@ function! valtair#arranger#vertical#new(options) abort
         \ 'logger': valtair#logger#new('arranger.vertical'),
     \ }
 
-    function! arranger.items(texts) abort
+    function! arranger.items(line_numbers) abort
         let lines = &lines - &cmdheight
         call self.logger.log('lines: ' . lines)
 
@@ -16,9 +16,9 @@ function! valtair#arranger#vertical#new(options) abort
 
         let items = []
         let i = 0
-        for text in a:texts
+        for line_number in a:line_numbers
             let item = {
-                \ 'text': text,
+                \ 'line_number': line_number,
                 \ 'width': self.width,
                 \ 'height': self.height,
                 \ 'row': (self.height + self.gap) * (i % max_row) + 1,
