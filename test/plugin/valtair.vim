@@ -65,3 +65,11 @@ function! s:suite.nop_logger()
 
     call s:sync_main('-collector-cmd=ls')
 endfunction
+
+function! s:suite.quit()
+    call s:sync_main('-collector=func -collector-func=ValtairTest')
+    call s:assert.equals(s:count_window(), 3)
+
+    ValtairDo quit
+    call s:assert.equals(s:count_window(), 1)
+endfunction

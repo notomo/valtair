@@ -31,5 +31,9 @@ function! valtair#tile#new(item, bufnr) abort
         call nvim_win_set_option(self.window, 'cursorcolumn', v:false)
     endfunction
 
+    function! tile.close() abort
+        call nvim_win_close(self.window, v:false)
+    endfunction
+
     return tile
 endfunction

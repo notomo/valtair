@@ -21,5 +21,7 @@ function! valtair#do(args) abort
         call s:arranger.enter_next()
     elseif a:args ==? 'prev'
         call s:arranger.enter_prev()
+    elseif a:args ==? 'quit'
+        call s:arranger.close()
     endif
 endfunction

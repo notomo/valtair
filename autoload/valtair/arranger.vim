@@ -77,6 +77,14 @@ function! valtair#arranger#new(impl) abort
         let self.current = index
     endfunction
 
+    function! arranger.close() abort
+        for tile in self.tiles
+            call tile.close()
+        endfor
+        let self.tiles = []
+        let self.current = 0
+    endfunction
+
     return arranger
 endfunction
 
