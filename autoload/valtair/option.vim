@@ -3,6 +3,10 @@ let s:options = {
     \ 'collector': {
         \ 'name': 'cmd',
         \ 'options': {},
+    \ },
+    \ 'arranger': {
+        \ 'name': 'vertical',
+        \ 'options': {},
     \ }
 \ }
 

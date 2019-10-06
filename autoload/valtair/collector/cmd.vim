@@ -10,7 +10,7 @@ function! valtair#collector#cmd#new(event_service, options) abort
         \ 'job': valtair#job#new(cmd, a:event_service),
     \ }
 
-    function! collector.items() abort
+    function! collector.texts() abort
         return self.job.stdout
     endfunction
 

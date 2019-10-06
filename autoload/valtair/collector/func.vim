@@ -5,10 +5,10 @@ function! valtair#collector#func#new(event_service, options) abort
         \ 'logger': valtair#logger#new('collector.func'),
     \ }
 
-    function! collector.items() abort
-        let items = call(self.func, [])
-        call self.logger.label('items').logs(items)
-        return items
+    function! collector.texts() abort
+        let texts = call(self.func, [])
+        call self.logger.label('texts').logs(texts)
+        return texts
     endfunction
 
     return collector

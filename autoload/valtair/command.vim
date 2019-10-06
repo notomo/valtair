@@ -12,8 +12,8 @@ function! valtair#command#new(collector, arranger, event_service) abort
     endfunction
 
     function! command.on_collector_finished(id) abort
-        let items = self.collector.items
-        call self.arranger.open_tiles(items)
+        let texts = self.collector.texts
+        call self.arranger.open_tiles(texts)
     endfunction
 
     function! command.wait() abort

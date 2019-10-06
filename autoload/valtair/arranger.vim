@@ -1,23 +1,24 @@
 
-function! valtair#arranger#new() abort
+function! valtair#arranger#new(impl) abort
     let arranger = {
         \ 'tiles': [],
+        \ 'impl': a:impl,
         \ 'current': 0,
     \ }
 
-    function! arranger.open_tiles(items) abort
-        if empty(a:items)
+    function! arranger.open_tiles(texts) abort
+        let items = self.impl.items(a:texts)
+        if empty(items)
             return
         endif
-        let self.tiles = map(copy(a:items), { _, item -> valtair#tile#new(item) })
 
-        let row = 1
-        let col = &columns / 2
+        let self.tiles = map(items, { _, item -> valtair#tile#new(item) })
+
         for tile in self.tiles
-            call tile.open(row, col)
-            let row += 4
+            call tile.open()
         endfor
         call self.tiles[0].enter()
+
         let self.current = 0
     endfunction
 
@@ -55,4 +56,17 @@ function! valtair#arranger#new() abort
     endfunction
 
     return arranger
+endfunction
+
+let s:directory = expand('<sfile>:p:h') . '/arranger'
+
+function! valtair#arranger#get_impl(arranger_options) abort
+    let name = a:arranger_options.name
+    let path = printf('%s/%s.vim', s:directory, name)
+    if !filereadable(path)
+        throw printf('arranger not found: %s', name)
+    endif
+
+    let func = printf('valtair#arranger#%s#new', name)
+    return call(func, [a:arranger_options.options])
 endfunction
