@@ -9,14 +9,17 @@ function! valtair#arranger#new(impl) abort
     function! arranger.open_tiles(texts) abort
         let lines = []
         let line_numbers = []
+
         let i = 0
+        let empty = split(repeat('_', float2nr(round(self.impl.height / 2)) - 1), '_', v:true)
         for text in a:texts
-            let i += 2
+            let i += len(empty) + 1
             let space = repeat(' ', (self.impl.width - strlen(text)) / 2)
-            call extend(lines, ['', space . text])
+            call extend(lines, empty)
+            call add(lines, space . text)
             call add(line_numbers, i)
         endfor
-        call add(lines, '')
+        call extend(lines, empty)
 
         let bufnr = nvim_create_buf(v:false, v:true)
         call nvim_buf_set_lines(bufnr, 0, -1, v:true, lines)
