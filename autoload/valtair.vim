@@ -8,7 +8,7 @@ function! valtair#main(args) abort
     let collector = valtair#collector#new(event_service, collector_impl)
 
     let arranger_impl = valtair#arranger#get_impl(options.arranger)
-    let s:arranger = valtair#arranger#new(arranger_impl)
+    let s:arranger = valtair#arranger#new(event_service, arranger_impl)
 
     let command = valtair#command#new(collector, s:arranger, event_service)
     call command.start()

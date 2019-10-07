@@ -1,6 +1,7 @@
 
-let s:JOB_FINISHED = 'ValrairJobFinished'
-let s:COLLECTOR_FINISHED = 'ValrairCollectorFinished'
+let s:JOB_FINISHED = 'ValtairJobFinished'
+let s:COLLECTOR_FINISHED = 'ValtairCollectorFinished'
+let s:WINDOW_CURSOR_MOVED = 'ValtairWindowCursorMoved'
 
 let s:callbacks = {}
 
@@ -10,19 +11,36 @@ function! valtair#event#service() abort
     \ }
 
     function! service.on_job_finished(id, callback) abort
-        call self._on_event(s:JOB_FINISHED, a:id, a:callback)
+        call self._on_event(s:JOB_FINISHED, a:id, a:callback, v:true)
     endfunction
 
     function! service.on_collector_finished(id, callback) abort
-        call self._on_event(s:COLLECTOR_FINISHED, a:id, a:callback)
+        call self._on_event(s:COLLECTOR_FINISHED, a:id, a:callback, v:true)
     endfunction
 
-    function! service._on_event(event_name, id, callback) abort
+    function! service.on_moved_window_cursor(id, callback, bufnr) abort
+        execute 'augroup' s:WINDOW_CURSOR_MOVED . a:bufnr
+        call self._on_event(s:WINDOW_CURSOR_MOVED . a:bufnr, a:id, a:callback, v:false)
+        execute 'augroup END'
+    endfunction
+
+    function! service.on_buffer_cursor_moved(bufnr) abort
+        execute printf('autocmd CursorMoved <buffer=%s> ++nested call valtair#event#service().window_cursor_moved(%s)', a:bufnr, a:bufnr)
+        execute printf('autocmd BufWipeout <buffer=%s> call s:clean_callback("%s")', a:bufnr, s:WINDOW_CURSOR_MOVED . a:bufnr)
+    endfunction
+
+    function! service._on_event(event_name, id, callback, once) abort
         if !has_key(s:callbacks, a:event_name)
             let s:callbacks[a:event_name] = {}
         endif
         let s:callbacks[a:event_name][a:id] = a:callback
-        execute printf('autocmd User %s:%s ++nested ++once call s:callback(expand("<amatch>"), "%s")', a:event_name, a:id, a:event_name)
+        if a:once
+            let once = '++once'
+        else
+            let once = ''
+        endif
+
+        execute printf('autocmd User %s:%s ++nested %s call s:callback(expand("<amatch>"), "%s", %s)', a:event_name, a:id, once, a:event_name, a:once)
     endfunction
 
     function! service.job_finished(id) abort
@@ -31,6 +49,11 @@ function! valtair#event#service() abort
 
     function! service.collector_finished(id) abort
         call self._emit(s:COLLECTOR_FINISHED, a:id)
+    endfunction
+
+    function! service.window_cursor_moved(bufnr) abort
+        let id = win_getid()
+        call self._emit(s:WINDOW_CURSOR_MOVED . a:bufnr, id)
     endfunction
 
     function! service._emit(event_name, id) abort
@@ -42,9 +65,16 @@ function! valtair#event#service() abort
     return service
 endfunction
 
-function! s:callback(amatch, event_name) abort
+function! s:callback(amatch, event_name, once) abort
     let [_, id] = split(a:amatch, a:event_name . ':', 'keep')
     call s:callbacks[a:event_name][id](id)
 
-    call remove(s:callbacks[a:event_name], id)
+    if a:once
+        call remove(s:callbacks[a:event_name], id)
+    endif
+endfunction
+
+function! s:clean_callback(group_name) abort
+    execute 'autocmd!' . a:group_name
+    call remove(s:callbacks, a:group_name)
 endfunction

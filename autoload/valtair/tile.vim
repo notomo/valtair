@@ -1,8 +1,9 @@
 
-function! valtair#tile#new(item, bufnr) abort
+function! valtair#tile#new(event_service, item, bufnr) abort
     let tile = {
         \ 'bufnr': a:bufnr,
         \ 'window': v:null,
+        \ 'event_service': a:event_service,
         \ 'item': a:item,
     \ }
 
@@ -21,6 +22,8 @@ function! valtair#tile#new(item, bufnr) abort
         call nvim_win_set_option(self.window, 'winhighlight', 'Normal:ValtairTailActive,NormalNC:ValtairTailInactive')
         call nvim_win_set_option(self.window, 'winblend', 15)
         call nvim_win_set_cursor(self.window, [self.item.line_number, 0])
+
+        call self.event_service.on_moved_window_cursor(self.window, { id -> nvim_win_set_cursor(self.window, [self.item.line_number, 0]) }, self.bufnr)
     endfunction
 
     function! tile.enter() abort

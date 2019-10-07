@@ -1,8 +1,9 @@
 
-function! valtair#arranger#new(impl) abort
+function! valtair#arranger#new(event_service, impl) abort
     let arranger = {
         \ 'tiles': [],
         \ 'impl': a:impl,
+        \ 'event_service': a:event_service,
         \ 'current': 0,
     \ }
 
@@ -34,12 +35,14 @@ function! valtair#arranger#new(impl) abort
             return
         endif
 
-        let self.tiles = map(items, { _, item -> valtair#tile#new(item, bufnr) })
+        let self.tiles = map(items, { _, item -> valtair#tile#new(self.event_service, item, bufnr) })
 
         for tile in self.tiles
             call tile.open()
         endfor
         call self.tiles[0].enter()
+
+        call self.event_service.on_buffer_cursor_moved(bufnr)
 
         let self.current = 0
     endfunction

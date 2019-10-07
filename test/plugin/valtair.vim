@@ -73,3 +73,15 @@ function! s:suite.quit()
     ValtairDo quit
     call s:assert.equals(s:count_window(), 1)
 endfunction
+
+function! s:suite.cursor_moved()
+    call s:sync_main('-collector=func -collector-func=ValtairTest')
+    call s:assert.equals(s:count_window(), 3)
+
+    let line_number = line('.')
+
+    normal! G
+    doautocmd CursorMoved
+
+    call s:assert.equals(line('.'), line_number)
+endfunction
