@@ -16,18 +16,19 @@ function! valtair#main(args) abort
     return command
 endfunction
 
-function! valtair#do(args) abort
-    call valtair#logger#new('valtair').log(string(a:args))
+let s:actions = {
+    \ 'next': { -> s:arranger.enter_next() },
+    \ 'prev': { -> s:arranger.enter_prev() },
+    \ 'left': { -> s:arranger.enter_left() },
+    \ 'right': { -> s:arranger.enter_right() },
+    \ 'quit': { -> s:arranger.close() },
+\ }
 
-    if a:args ==? 'next'
-        call s:arranger.enter_next()
-    elseif a:args ==? 'prev'
-        call s:arranger.enter_prev()
-    elseif a:args ==? 'left'
-        call s:arranger.enter_left()
-    elseif a:args ==? 'right'
-        call s:arranger.enter_right()
-    elseif a:args ==? 'quit'
-        call s:arranger.close()
+function! valtair#do(args) abort
+    call valtair#logger#new('valtair').list_log(a:args)
+
+    if has_key(s:actions, a:args)
+        return s:actions[a:args]()
     endif
+    throw printf('not found action: %s', a:args)
 endfunction

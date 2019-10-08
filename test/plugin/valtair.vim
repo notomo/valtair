@@ -72,6 +72,8 @@ function! s:suite.nop_logger()
     call valtair#logger#clear()
 
     call s:sync_main('-collector-cmd=ls')
+
+    ValtairDo quit
 endfunction
 
 function! s:suite.quit()

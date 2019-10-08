@@ -53,6 +53,10 @@ function! valtair#logger#new(...) abort
         call self.log(string(a:dict))
     endfunction
 
+    function! logger.list_log(list) abort
+        call self.log(string(a:list))
+    endfunction
+
     return logger
 endfunction
 
@@ -76,6 +80,9 @@ function! s:nop_logger(...) abort
     endfunction
 
     function! logger.dict_log(dict) abort
+    endfunction
+
+    function! logger.list_log(list) abort
     endfunction
 
     return logger
