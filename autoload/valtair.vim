@@ -17,10 +17,16 @@ function! valtair#main(args) abort
 endfunction
 
 function! valtair#do(args) abort
+    call valtair#logger#new('valtair').log(string(a:args))
+
     if a:args ==? 'next'
         call s:arranger.enter_next()
     elseif a:args ==? 'prev'
         call s:arranger.enter_prev()
+    elseif a:args ==? 'left'
+        call s:arranger.enter_left()
+    elseif a:args ==? 'right'
+        call s:arranger.enter_right()
     elseif a:args ==? 'quit'
         call s:arranger.close()
     endif

@@ -2,6 +2,7 @@
 call themis#option('recursive', 1)
 
 let s:root = getcwd()
+set columns=200
 
 function! ValtairTestBeforeEach() abort
     execute 'cd' s:root

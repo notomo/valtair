@@ -4,6 +4,10 @@ function! valtair#arranger#vertical#new(options) abort
         \ 'width': 30,
         \ 'height': 3,
         \ 'gap': 1,
+        \ 'row_count': 0,
+        \ 'max_row_count': 0,
+        \ 'column_count': 0,
+        \ 'max_column_count': 0,
         \ 'logger': valtair#logger#new('arranger.vertical'),
     \ }
 
@@ -11,8 +15,14 @@ function! valtair#arranger#vertical#new(options) abort
         let lines = &lines - &cmdheight
         call self.logger.log('lines: ' . lines)
 
-        let max_row = lines / (self.height + self.gap)
-        call self.logger.log('max_row: ' . max_row)
+        let self.max_row_count = lines / (self.height + self.gap)
+        call self.logger.log('max_row_count: ' . self.max_row_count)
+
+        let columns = &columns
+        call self.logger.log('columns: ' . columns)
+
+        let self.max_column_count = columns / (self.width + self.gap)
+        call self.logger.log('max_column_count: ' . self.max_column_count)
 
         let items = []
         let i = 0
@@ -21,14 +31,21 @@ function! valtair#arranger#vertical#new(options) abort
                 \ 'line_number': line_number,
                 \ 'width': self.width,
                 \ 'height': self.height,
-                \ 'row': (self.height + self.gap) * (i % max_row) + 1,
-                \ 'col': (self.width + self.gap) * (i / max_row) + 1,
+                \ 'row': (self.height + self.gap) * (i % self.max_row_count) + 1,
+                \ 'col': (self.width + self.gap) * (i / self.max_row_count) + 1,
             \ }
             call self.logger.label('item').dict_log(item)
 
             call add(items, item)
             let i += 1
         endfor
+
+        let self.row_count = len(a:line_numbers) >= self.max_row_count ? self.max_row_count : len(a:line_numbers)
+        call self.logger.log('row_count: ' . self.row_count)
+
+        let remain = len(a:line_numbers) % self.max_row_count
+        let self.column_count = len(a:line_numbers) / self.max_row_count + (remain > 0 ? 1 : 0)
+        call self.logger.log('column_count: ' . self.column_count)
 
         return items
     endfunction

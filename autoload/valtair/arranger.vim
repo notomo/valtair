@@ -5,6 +5,7 @@ function! valtair#arranger#new(event_service, impl) abort
         \ 'impl': a:impl,
         \ 'event_service': a:event_service,
         \ 'current': 0,
+        \ 'logger': valtair#logger#new('arranger'),
     \ }
 
     function! arranger.open_tiles(texts) abort
@@ -52,13 +53,7 @@ function! valtair#arranger#new(event_service, impl) abort
             return
         endif
 
-        if self.current + 1 >= len(self.tiles)
-            call self.tiles[0].enter()
-            let self.current = 0
-            return
-        endif
-
-        let index = self.current + 1
+        let index = (self.current + 1) % len(self.tiles)
         call self.tiles[index].enter()
         let self.current = index
     endfunction
@@ -68,14 +63,38 @@ function! valtair#arranger#new(event_service, impl) abort
             return
         endif
 
-        if self.current - 1 < 0
-            let index = len(self.tiles) - 1
-            call self.tiles[index].enter()
-            let self.current = index
+        let index = (self.current - 1) % len(self.tiles)
+        call self.tiles[index].enter()
+        let self.current = index
+    endfunction
+
+    function! arranger.enter_right() abort
+        if empty(self.tiles)
             return
         endif
 
-        let index = self.current - 1
+        let row_column = self.impl.row_count * self.impl.column_count
+        let index = (self.current + self.impl.row_count) % row_column
+        if index >= len(self.tiles)
+            let index = index - ((self.impl.column_count - 1) * self.impl.row_count)
+        endif
+        call self.tiles[index].enter()
+        let self.current = index
+    endfunction
+
+    function! arranger.enter_left() abort
+        if empty(self.tiles)
+            return
+        endif
+
+        let row_column = self.impl.row_count * self.impl.column_count
+        let index = (self.current - self.impl.row_count) % row_column
+        if index < 0
+            let index = index + self.impl.column_count * self.impl.row_count
+        endif
+        if index >= len(self.tiles)
+            let index = index - self.impl.row_count
+        endif
         call self.tiles[index].enter()
         let self.current = index
     endfunction
