@@ -19,14 +19,25 @@ function! valtair#event#service() abort
     endfunction
 
     function! service.on_moved_window_cursor(id, callback, bufnr) abort
-        execute 'augroup' s:WINDOW_CURSOR_MOVED . a:bufnr
-        call self._on_event(s:WINDOW_CURSOR_MOVED . a:bufnr, a:id, a:callback, v:false)
+        call self._buffer_group_event(s:WINDOW_CURSOR_MOVED, a:id, a:callback, a:bufnr)
+    endfunction
+
+    function! service._buffer_group_event(event_name, id, callback, bufnr) abort
+        let group_name = self._buffer_event_name(a:event_name, a:bufnr)
+        execute 'augroup' group_name
+            call self._on_event(group_name, a:id, a:callback, v:false)
         execute 'augroup END'
+    endfunction
+
+    function! service._buffer_event_name(event_name, bufnr) abort
+        return printf('%s_%s', a:event_name, a:bufnr)
     endfunction
 
     function! service.on_buffer_cursor_moved(bufnr) abort
         execute printf('autocmd CursorMoved <buffer=%s> ++nested call valtair#event#service().window_cursor_moved(%s)', a:bufnr, a:bufnr)
-        execute printf('autocmd BufWipeout <buffer=%s> call s:clean_callback("%s")', a:bufnr, s:WINDOW_CURSOR_MOVED . a:bufnr)
+
+        let event_name = self._buffer_event_name(s:WINDOW_CURSOR_MOVED, a:bufnr)
+        execute printf('autocmd BufWipeout <buffer=%s> call s:clean_group("%s")', a:bufnr, event_name)
     endfunction
 
     function! service._on_event(event_name, id, callback, once) abort
@@ -53,7 +64,8 @@ function! valtair#event#service() abort
 
     function! service.window_cursor_moved(bufnr) abort
         let id = win_getid()
-        call self._emit(s:WINDOW_CURSOR_MOVED . a:bufnr, id)
+        let event_name = self._buffer_event_name(s:WINDOW_CURSOR_MOVED, a:bufnr)
+        call self._emit(event_name, id)
     endfunction
 
     function! service._emit(event_name, id) abort
@@ -74,7 +86,7 @@ function! s:callback(amatch, event_name, once) abort
     endif
 endfunction
 
-function! s:clean_callback(group_name) abort
+function! s:clean_group(group_name) abort
     execute 'autocmd!' . a:group_name
     call remove(s:callbacks, a:group_name)
 endfunction
