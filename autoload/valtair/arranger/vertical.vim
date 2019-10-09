@@ -34,7 +34,7 @@ function! valtair#arranger#vertical#new(options) abort
                 \ 'row': (self.height + self.gap) * (i % self.max_row_count) + 1,
                 \ 'col': (self.width + self.gap) * (i / self.max_row_count) + 1,
             \ }
-            call self.logger.label('item').dict_log(item)
+            call self.logger.label('item').log(item)
 
             call add(items, item)
             let i += 1

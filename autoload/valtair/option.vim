@@ -26,7 +26,7 @@ function! valtair#option#parse(raw_args) abort
         endif
     endfor
 
-    call valtair#logger#new('option').dict_log(options)
+    call valtair#logger#new('option').log(options)
     return options
 endfunction
 

@@ -25,7 +25,7 @@ let s:actions = {
 \ }
 
 function! valtair#do(args) abort
-    call valtair#logger#new('valtair').list_log(a:args)
+    call valtair#logger#new('valtair').log(a:args)
 
     if has_key(s:actions, a:args)
         return s:actions[a:args]()

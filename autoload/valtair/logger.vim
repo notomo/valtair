@@ -33,8 +33,13 @@ function! valtair#logger#new(...) abort
     endfunction
 
     function! logger.log(message) abort
+        if type(a:message) == v:t_list || type(a:message) == v:t_dict
+            let message = string(a:message)
+        else
+            let message = a:message
+        endif
         " FIXME: REMOVE ANSI
-        let message = substitute(a:message, "\<ESC>\\[\\d*[a-zA-Z]", '', 'g')
+        let message = substitute(message, "\<ESC>\\[\\d*[a-zA-Z]", '', 'g')
         call self.func(self._label . message)
     endfunction
 
@@ -47,14 +52,6 @@ function! valtair#logger#new(...) abort
     function! logger.buffer_log(bufnr) abort
         let lines = getbufline(a:bufnr, 1, '$')
         call self.logs(lines)
-    endfunction
-
-    function! logger.dict_log(dict) abort
-        call self.log(string(a:dict))
-    endfunction
-
-    function! logger.list_log(list) abort
-        call self.log(string(a:list))
     endfunction
 
     return logger
@@ -77,12 +74,6 @@ function! s:nop_logger(...) abort
     endfunction
 
     function! logger.buffer_log(bufnr) abort
-    endfunction
-
-    function! logger.dict_log(dict) abort
-    endfunction
-
-    function! logger.list_log(list) abort
     endfunction
 
     return logger
