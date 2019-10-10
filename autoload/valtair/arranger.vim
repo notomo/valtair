@@ -109,16 +109,3 @@ function! valtair#arranger#new(event_service, impl) abort
 
     return arranger
 endfunction
-
-let s:directory = expand('<sfile>:p:h') . '/arranger'
-
-function! valtair#arranger#get_impl(arranger_options) abort
-    let name = a:arranger_options.name
-    let path = printf('%s/%s.vim', s:directory, name)
-    if !filereadable(path)
-        throw printf('arranger not found: %s', name)
-    endif
-
-    let func = printf('valtair#arranger#%s#new', name)
-    return call(func, [a:arranger_options.options])
-endfunction

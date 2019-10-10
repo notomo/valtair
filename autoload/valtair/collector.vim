@@ -37,16 +37,3 @@ function! valtair#collector#new(event_service, impl) abort
 
     return collector
 endfunction
-
-let s:directory = expand('<sfile>:p:h') . '/collector'
-
-function! valtair#collector#get_impl(event_service, collector_options) abort
-    let name = a:collector_options.name
-    let path = printf('%s/%s.vim', s:directory, name)
-    if !filereadable(path)
-        throw printf('collector not found: %s', name)
-    endif
-
-    let func = printf('valtair#collector#%s#new', name)
-    return call(func, [a:event_service, a:collector_options.options])
-endfunction
