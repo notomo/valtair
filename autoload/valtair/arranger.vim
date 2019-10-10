@@ -9,70 +9,36 @@ function! valtair#arranger#new(event_service, impl) abort
     \ }
 
     function! arranger.open_tiles(texts) abort
-        let lines = []
-        let line_numbers = []
-
-        let i = 0
-        let empty = split(repeat('_', float2nr(round(self.impl.height / 2)) - 1), '_', v:true)
-        for text in a:texts
-            let i += len(empty) + 1
-            let space = repeat(' ', (self.impl.width - strlen(text)) / 2)
-            call extend(lines, empty)
-            call add(lines, space . text)
-            call add(line_numbers, i)
-        endfor
-        call extend(lines, empty)
-
-        let bufnr = nvim_create_buf(v:false, v:true)
-        call nvim_buf_set_lines(bufnr, 0, -1, v:true, lines)
-        call nvim_buf_set_option(bufnr, 'modifiable', v:false)
-        call nvim_buf_set_option(bufnr, 'filetype', 'valtair')
-        call nvim_buf_set_option(bufnr, 'bufhidden', 'wipe')
-        call nvim_buf_set_var(bufnr, '&scrolloff', 0)
-        call nvim_buf_set_var(bufnr, '&sidescrolloff', 0)
-
-        let items = self.impl.items(line_numbers)
+        let buffer = valtair#buffer#new(self.event_service, a:texts, self.impl.width, self.impl.height)
+        let items = self.impl.items(buffer.line_numbers)
         if empty(items)
             return
         endif
 
-        let self.tiles = map(items, { _, item -> valtair#tile#new(self.event_service, item, bufnr) })
-
+        let self.tiles = map(items, { _, item -> valtair#tile#new(self.event_service, item, buffer.bufnr) })
         for tile in self.tiles
             call tile.open()
         endfor
+
+        call buffer.fix_cursor()
+
         call self.tiles[0].enter()
-
-        call self.event_service.on_buffer_cursor_moved(bufnr)
-
         let self.current = 0
     endfunction
 
     function! arranger.enter_next() abort
-        if empty(self.tiles)
-            return
-        endif
-
         let index = (self.current + 1) % len(self.tiles)
         call self.tiles[index].enter()
         let self.current = index
     endfunction
 
     function! arranger.enter_prev() abort
-        if empty(self.tiles)
-            return
-        endif
-
         let index = (self.current - 1) % len(self.tiles)
         call self.tiles[index].enter()
         let self.current = index
     endfunction
 
     function! arranger.enter_right() abort
-        if empty(self.tiles)
-            return
-        endif
-
         let row_column = self.impl.row_count * self.impl.column_count
         let index = (self.current + self.impl.row_count) % row_column
         if index >= len(self.tiles)
@@ -83,10 +49,6 @@ function! valtair#arranger#new(event_service, impl) abort
     endfunction
 
     function! arranger.enter_left() abort
-        if empty(self.tiles)
-            return
-        endif
-
         let row_column = self.impl.row_count * self.impl.column_count
         let index = (self.current - self.impl.row_count) % row_column
         if index < 0
