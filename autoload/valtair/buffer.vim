@@ -27,7 +27,7 @@ function! valtair#buffer#new(event_service, texts, tile_width, tile_height) abor
     call nvim_buf_set_var(buffer.bufnr, '&sidescrolloff', 0)
 
     function! buffer.fix_cursor() abort
-        call self.event_service.on_buffer_cursor_moved(self.bufnr)
+        call self.event_service.fix_window_cursor(self.bufnr)
     endfunction
 
     return buffer

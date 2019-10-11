@@ -33,7 +33,7 @@ function! valtair#event#service() abort
         return printf('%s_%s', a:event_name, a:bufnr)
     endfunction
 
-    function! service.on_buffer_cursor_moved(bufnr) abort
+    function! service.fix_window_cursor(bufnr) abort
         execute printf('autocmd CursorMoved <buffer=%s> ++nested call valtair#event#service().window_cursor_moved(%s)', a:bufnr, a:bufnr)
 
         let event_name = self._buffer_event_name(s:WINDOW_CURSOR_MOVED, a:bufnr)
