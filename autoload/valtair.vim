@@ -5,10 +5,10 @@ function! valtair#main(args) abort
     let event_service = valtair#event#service()
     let loader = valtair#loader#new()
 
-    let collector_impl = loader.load('valtair/collector', options.collector.name, { new -> new(event_service, options.collector.options) })
+    let collector_impl = loader.load('valtair/collector', options.collector.name, [event_service, options.collector.options])
     let collector = valtair#collector#new(event_service, collector_impl)
 
-    let arranger_impl = loader.load('valtair/arranger', options.arranger.name, { new -> new(options.arranger.options) })
+    let arranger_impl = loader.load('valtair/arranger', options.arranger.name, [options.arranger.options])
     let s:arranger = valtair#arranger#new(event_service, arranger_impl)
 
     let command = valtair#command#new(collector, s:arranger, event_service)
