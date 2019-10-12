@@ -9,7 +9,7 @@ function! valtair#arranger#new(event_service, impl) abort
     \ }
 
     function! arranger.open_tiles(texts) abort
-        let buffer = valtair#buffer#new(self.event_service, a:texts, self.impl.width, self.impl.height)
+        let buffer = valtair#buffer#new(self.event_service, a:texts, self.impl.padding)
         let items = self.impl.items(buffer.line_numbers)
         if empty(items)
             return

@@ -2,10 +2,12 @@
 function! valtair#arranger#vertical#new(options) abort
     let arranger = {
         \ 'width': 30,
-        \ 'height': 3,
         \ 'gap': 1,
         \ 'logger': valtair#logger#new('arranger.vertical'),
     \ }
+    let arranger['padding'] = valtair#padding#new(1).with_width(arranger.width)
+    let arranger['height'] = arranger.padding.height
+
     let lines = &lines - &cmdheight
     let arranger['max_row_count'] = lines / (arranger.height + arranger.gap)
     let columns = &columns
