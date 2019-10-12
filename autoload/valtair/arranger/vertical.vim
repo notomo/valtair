@@ -1,33 +1,37 @@
 
 function! valtair#arranger#vertical#new(options) abort
+    let width = 30
+    let top_bottom = 1
+    let padding = valtair#padding#new(top_bottom).with_width(width)
+
     let arranger = {
-        \ 'width': 30,
-        \ 'gap': 1,
         \ 'logger': valtair#logger#new('arranger.vertical'),
+        \ 'padding': padding,
+        \ '_width': width,
+        \ '_height': padding.height,
+        \ '_gap': 1,
     \ }
-    let arranger['padding'] = valtair#padding#new(1).with_width(arranger.width)
-    let arranger['height'] = arranger.padding.height
 
     let lines = &lines - &cmdheight
-    let arranger['max_row_count'] = lines / (arranger.height + arranger.gap)
+    let arranger['_max_row_count'] = lines / (arranger._height + arranger._gap)
     let columns = &columns
-    let arranger['max_column_count'] = columns / (arranger.width + arranger.gap)
+    let arranger['_max_column_count'] = columns / (arranger._width + arranger._gap)
 
     function! arranger.items(line_numbers) abort
         let items = []
         let i = 0
         for line_number in a:line_numbers
-            let col_index = i / self.max_row_count
-            if col_index >= self.max_column_count
+            let col_index = i / self._max_row_count
+            if col_index >= self._max_column_count
                 break
             endif
 
             let item = {
                 \ 'line_number': line_number,
-                \ 'width': self.width,
-                \ 'height': self.height,
-                \ 'row': (self.height + self.gap) * (i % self.max_row_count) + 1,
-                \ 'col': (self.width + self.gap) * col_index + 1,
+                \ 'width': self._width,
+                \ 'height': self._height,
+                \ 'row': (self._height + self._gap) * (i % self._max_row_count) + 1,
+                \ 'col': (self._width + self._gap) * col_index + 1,
             \ }
             call self.logger.label('item').log(item)
 
@@ -39,9 +43,9 @@ function! valtair#arranger#vertical#new(options) abort
     endfunction
 
     function! arranger.right(current, count) abort
-        let row_count = a:count >= self.max_row_count ? self.max_row_count : a:count
-        let remain = a:count % self.max_row_count
-        let column_count = a:count / self.max_row_count + (remain > 0 ? 1 : 0)
+        let row_count = a:count >= self._max_row_count ? self._max_row_count : a:count
+        let remain = a:count % self._max_row_count
+        let column_count = a:count / self._max_row_count + (remain > 0 ? 1 : 0)
 
         let index = (a:current + row_count) % (row_count * column_count)
         if index >= a:count
@@ -51,9 +55,9 @@ function! valtair#arranger#vertical#new(options) abort
     endfunction
 
     function! arranger.left(current, count) abort
-        let row_count = a:count >= self.max_row_count ? self.max_row_count : a:count
-        let remain = a:count % self.max_row_count
-        let column_count = a:count / self.max_row_count + (remain > 0 ? 1 : 0)
+        let row_count = a:count >= self._max_row_count ? self._max_row_count : a:count
+        let remain = a:count % self._max_row_count
+        let column_count = a:count / self._max_row_count + (remain > 0 ? 1 : 0)
 
         let index = (a:current - row_count) % (row_count * column_count)
         if index < 0
