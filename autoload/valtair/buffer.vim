@@ -23,8 +23,6 @@ function! valtair#buffer#new(event_service, texts, tile_width, tile_height) abor
     call nvim_buf_set_option(buffer.bufnr, 'modifiable', v:false)
     call nvim_buf_set_option(buffer.bufnr, 'filetype', 'valtair')
     call nvim_buf_set_option(buffer.bufnr, 'bufhidden', 'wipe')
-    call nvim_buf_set_var(buffer.bufnr, '&scrolloff', 0)
-    call nvim_buf_set_var(buffer.bufnr, '&sidescrolloff', 0)
 
     function! buffer.fix_cursor() abort
         call self.event_service.fix_window_cursor(self.bufnr)
