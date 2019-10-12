@@ -4,26 +4,14 @@ function! valtair#arranger#vertical#new(options) abort
         \ 'width': 30,
         \ 'height': 3,
         \ 'gap': 1,
-        \ 'row_count': 0,
-        \ 'max_row_count': 0,
-        \ 'column_count': 0,
-        \ 'max_column_count': 0,
         \ 'logger': valtair#logger#new('arranger.vertical'),
     \ }
+    let lines = &lines - &cmdheight
+    let arranger['max_row_count'] = lines / (arranger.height + arranger.gap)
+    let columns = &columns
+    let arranger['max_column_count'] = columns / (arranger.width + arranger.gap)
 
     function! arranger.items(line_numbers) abort
-        let lines = &lines - &cmdheight
-        call self.logger.log('lines: ' . lines)
-
-        let self.max_row_count = lines / (self.height + self.gap)
-        call self.logger.log('max_row_count: ' . self.max_row_count)
-
-        let columns = &columns
-        call self.logger.log('columns: ' . columns)
-
-        let self.max_column_count = columns / (self.width + self.gap)
-        call self.logger.log('max_column_count: ' . self.max_column_count)
-
         let items = []
         let i = 0
         for line_number in a:line_numbers
@@ -45,14 +33,34 @@ function! valtair#arranger#vertical#new(options) abort
             let i += 1
         endfor
 
-        let self.row_count = len(items) >= self.max_row_count ? self.max_row_count : len(items)
-        call self.logger.log('row_count: ' . self.row_count)
-
-        let remain = len(items) % self.max_row_count
-        let self.column_count = len(items) / self.max_row_count + (remain > 0 ? 1 : 0)
-        call self.logger.log('column_count: ' . self.column_count)
-
         return items
+    endfunction
+
+    function! arranger.right(current, count) abort
+        let row_count = a:count >= self.max_row_count ? self.max_row_count : a:count
+        let remain = a:count % self.max_row_count
+        let column_count = a:count / self.max_row_count + (remain > 0 ? 1 : 0)
+
+        let index = (a:current + row_count) % (row_count * column_count)
+        if index >= a:count
+            return index - ((column_count - 1) * row_count)
+        endif
+        return index
+    endfunction
+
+    function! arranger.left(current, count) abort
+        let row_count = a:count >= self.max_row_count ? self.max_row_count : a:count
+        let remain = a:count % self.max_row_count
+        let column_count = a:count / self.max_row_count + (remain > 0 ? 1 : 0)
+
+        let index = (a:current - row_count) % (row_count * column_count)
+        if index < 0
+            let index = index + column_count * row_count
+        endif
+        if index >= a:count
+            return index - row_count
+        endif
+        return index
     endfunction
 
     return arranger

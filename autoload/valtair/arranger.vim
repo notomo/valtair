@@ -39,24 +39,13 @@ function! valtair#arranger#new(event_service, impl) abort
     endfunction
 
     function! arranger.enter_right() abort
-        let row_column = self.impl.row_count * self.impl.column_count
-        let index = (self.current + self.impl.row_count) % row_column
-        if index >= len(self.tiles)
-            let index = index - ((self.impl.column_count - 1) * self.impl.row_count)
-        endif
+        let index = self.impl.right(self.current, len(self.tiles))
         call self.tiles[index].enter()
         let self.current = index
     endfunction
 
     function! arranger.enter_left() abort
-        let row_column = self.impl.row_count * self.impl.column_count
-        let index = (self.current - self.impl.row_count) % row_column
-        if index < 0
-            let index = index + self.impl.column_count * self.impl.row_count
-        endif
-        if index >= len(self.tiles)
-            let index = index - self.impl.row_count
-        endif
+        let index = self.impl.left(self.current, len(self.tiles))
         call self.tiles[index].enter()
         let self.current = index
     endfunction
