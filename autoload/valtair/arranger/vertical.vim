@@ -27,12 +27,17 @@ function! valtair#arranger#vertical#new(options) abort
         let items = []
         let i = 0
         for line_number in a:line_numbers
+            let col_index = i / self.max_row_count
+            if col_index >= self.max_column_count
+                break
+            endif
+
             let item = {
                 \ 'line_number': line_number,
                 \ 'width': self.width,
                 \ 'height': self.height,
                 \ 'row': (self.height + self.gap) * (i % self.max_row_count) + 1,
-                \ 'col': (self.width + self.gap) * (i / self.max_row_count) + 1,
+                \ 'col': (self.width + self.gap) * col_index + 1,
             \ }
             call self.logger.label('item').log(item)
 
@@ -40,11 +45,11 @@ function! valtair#arranger#vertical#new(options) abort
             let i += 1
         endfor
 
-        let self.row_count = len(a:line_numbers) >= self.max_row_count ? self.max_row_count : len(a:line_numbers)
+        let self.row_count = len(items) >= self.max_row_count ? self.max_row_count : len(items)
         call self.logger.log('row_count: ' . self.row_count)
 
-        let remain = len(a:line_numbers) % self.max_row_count
-        let self.column_count = len(a:line_numbers) / self.max_row_count + (remain > 0 ? 1 : 0)
+        let remain = len(items) % self.max_row_count
+        let self.column_count = len(items) / self.max_row_count + (remain > 0 ? 1 : 0)
         call self.logger.log('column_count: ' . self.column_count)
 
         return items
