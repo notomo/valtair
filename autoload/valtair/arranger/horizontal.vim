@@ -1,5 +1,5 @@
 
-function! valtair#arranger#vertical#new(options) abort
+function! valtair#arranger#horizontal#new(options) abort
     let width = 30
     let top_bottom = 1
     let padding = valtair#padding#new(top_bottom).with_width(width)
@@ -7,36 +7,39 @@ function! valtair#arranger#vertical#new(options) abort
     let margin = 1
 
     let arranger = {
-        \ 'logger': valtair#logger#new('arranger.vertical'),
+        \ 'logger': valtair#logger#new('arranger.horizontal'),
         \ 'padding': padding,
         \ '_table': valtair#table#editor(rect, margin),
     \ }
 
     function! arranger.items(line_numbers) abort
         let items = []
-        for rows in self._table.make_cells_vertically(a:line_numbers)
+        for rows in self._table.make_cells_horizontally(a:line_numbers)
             for cell in rows
                 let item = {
                     \ 'rect': self._table.rect,
+                    \ '_index': cell.index,
                     \ 'line_number': cell.content,
                     \ 'x': cell.x,
                     \ 'y': cell.y,
                 \ }
-                call self.logger.label('item').log(item)
 
                 call add(items, item)
             endfor
         endfor
 
+        call sort(items, { a, b -> a._index > b._index })
+        call self.logger.label('item').logs(items)
+
         return items
     endfunction
 
     function! arranger.next() abort
-        return self.down()
+        return self.right()
     endfunction
 
     function! arranger.prev() abort
-        return self.up()
+        return self.left()
     endfunction
 
     function! arranger.up() abort

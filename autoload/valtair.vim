@@ -20,6 +20,8 @@ endfunction
 let s:actions = {
     \ 'next': { -> s:arranger.enter_next() },
     \ 'prev': { -> s:arranger.enter_prev() },
+    \ 'up': { -> s:arranger.enter_up() },
+    \ 'down': { -> s:arranger.enter_down() },
     \ 'left': { -> s:arranger.enter_left() },
     \ 'right': { -> s:arranger.enter_right() },
     \ 'quit': { -> s:arranger.close() },

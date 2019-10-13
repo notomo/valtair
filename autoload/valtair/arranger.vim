@@ -4,7 +4,6 @@ function! valtair#arranger#new(event_service, impl) abort
         \ 'tiles': [],
         \ 'impl': a:impl,
         \ 'event_service': a:event_service,
-        \ 'current': 0,
         \ 'logger': valtair#logger#new('arranger'),
     \ }
 
@@ -23,31 +22,36 @@ function! valtair#arranger#new(event_service, impl) abort
         call buffer.fix_cursor()
 
         call self.tiles[0].enter()
-        let self.current = 0
     endfunction
 
     function! arranger.enter_next() abort
-        let index = (self.current + 1) % len(self.tiles)
+        let index = self.impl.next()
         call self.tiles[index].enter()
-        let self.current = index
     endfunction
 
     function! arranger.enter_prev() abort
-        let index = (self.current - 1) % len(self.tiles)
+        let index = self.impl.prev()
         call self.tiles[index].enter()
-        let self.current = index
     endfunction
 
     function! arranger.enter_right() abort
-        let index = self.impl.right(self.current)
+        let index = self.impl.right()
         call self.tiles[index].enter()
-        let self.current = index
     endfunction
 
     function! arranger.enter_left() abort
-        let index = self.impl.left(self.current)
+        let index = self.impl.left()
         call self.tiles[index].enter()
-        let self.current = index
+    endfunction
+
+    function! arranger.enter_down() abort
+        let index = self.impl.down()
+        call self.tiles[index].enter()
+    endfunction
+
+    function! arranger.enter_up() abort
+        let index = self.impl.up()
+        call self.tiles[index].enter()
     endfunction
 
     function! arranger.close() abort
@@ -55,7 +59,6 @@ function! valtair#arranger#new(event_service, impl) abort
             call tile.close()
         endfor
         let self.tiles = []
-        let self.current = 0
     endfunction
 
     return arranger

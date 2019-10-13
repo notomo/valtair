@@ -141,6 +141,12 @@ function! s:suite.left_right()
     call s:assert.equals(s:count_window(), 13)
     call s:assert.contains(s:line(), '0')
 
+    ValtairDo left
+    call s:assert.contains(s:line(), '9')
+
+    ValtairDo right
+    call s:assert.contains(s:line(), '0')
+
     ValtairDo next
     call s:assert.contains(s:line(), '1')
 
@@ -151,10 +157,8 @@ function! s:suite.left_right()
     call s:assert.contains(s:line(), '11')
 
     ValtairDo right
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo next
     call s:assert.contains(s:line(), '2')
+
     ValtairDo next
     call s:assert.contains(s:line(), '3')
 
@@ -162,25 +166,77 @@ function! s:suite.left_right()
     call s:assert.contains(s:line(), '8')
 
     ValtairDo right
+    call s:assert.contains(s:line(), '4')
+
+    ValtairDo left
+    call s:assert.contains(s:line(), '8')
+
+    ValtairDo left
     call s:assert.contains(s:line(), '3')
-
-    ValtairDo prev
-    call s:assert.contains(s:line(), '2')
-    ValtairDo prev
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '11')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '6')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo next
-    call s:assert.contains(s:line(), '2')
 
     ValtairDo left
     call s:assert.contains(s:line(), '7')
+endfunction
+
+command! ValtairHorizontalTest call s:horizontal_echomsg()
+function! s:horizontal_echomsg() abort
+    echomsg '0'
+    echomsg '1'
+    echomsg '2'
+    echomsg '3'
+    echomsg '4'
+    echomsg '5'
+    echomsg '6'
+    echomsg '7'
+    echomsg '8'
+    echomsg '9'
+    echomsg '10'
+    echomsg '11'
+    echomsg '12'
+    echomsg '13'
+endfunction
+
+function! s:suite.horizontal()
+    call s:sync_main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call s:assert.equals(s:count_window(), 15)
+    call s:assert.contains(s:line(), '0')
+
+    ValtairDo right
+    call s:assert.contains(s:line(), '1')
+
+    ValtairDo right
+    call s:assert.contains(s:line(), '2')
+
+    ValtairDo left
+    call s:assert.contains(s:line(), '1')
+
+    ValtairDo left
+    call s:assert.contains(s:line(), '0')
+
+    ValtairDo left
+    call s:assert.contains(s:line(), '13')
+
+    ValtairDo right
+    call s:assert.contains(s:line(), '0')
+
+    ValtairDo down
+    call s:assert.contains(s:line(), '6')
+
+    ValtairDo down
+    call s:assert.contains(s:line(), '12')
+
+    ValtairDo down
+    call s:assert.contains(s:line(), '1')
+
+    ValtairDo up
+    call s:assert.contains(s:line(), '12')
+
+    ValtairDo up
+    call s:assert.contains(s:line(), '6')
+
+    ValtairDo up
+    call s:assert.contains(s:line(), '0')
+
+    ValtairDo up
+    call s:assert.contains(s:line(), '11')
 endfunction
