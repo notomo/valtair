@@ -39,13 +39,13 @@ function! valtair#arranger#new(event_service, impl) abort
     endfunction
 
     function! arranger.enter_right() abort
-        let index = self.impl.right(self.current, len(self.tiles))
+        let index = self.impl.right(self.current)
         call self.tiles[index].enter()
         let self.current = index
     endfunction
 
     function! arranger.enter_left() abort
-        let index = self.impl.left(self.current, len(self.tiles))
+        let index = self.impl.left(self.current)
         call self.tiles[index].enter()
         let self.current = index
     endfunction

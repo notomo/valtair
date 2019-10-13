@@ -10,10 +10,10 @@ function! valtair#tile#new(event_service, item, bufnr) abort
     function! tile.open() abort
         let self.window = nvim_open_win(self.bufnr, v:false, {
             \ 'relative': 'editor',
-            \ 'height': self.item.height,
-            \ 'width': self.item.width,
-            \ 'row': self.item.row,
-            \ 'col': self.item.col,
+            \ 'height': self.item.rect.height,
+            \ 'width': self.item.rect.width,
+            \ 'row': self.item.y,
+            \ 'col': self.item.x,
             \ 'anchor': 'NW',
             \ 'focusable': v:false,
             \ 'external': v:false,
