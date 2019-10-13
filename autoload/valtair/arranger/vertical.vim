@@ -14,16 +14,18 @@ function! valtair#arranger#vertical#new(options) abort
 
     function! arranger.items(line_numbers) abort
         let items = []
-        for cell in self._table.make_vertical_cells(a:line_numbers)
-            let item = {
-                \ 'rect': self._table.rect,
-                \ 'line_number': cell.content,
-                \ 'x': cell.x,
-                \ 'y': cell.y,
-            \ }
-            call self.logger.label('item').log(item)
+        for rows in self._table.make_cells_vertically(a:line_numbers)
+            for cell in rows
+                let item = {
+                    \ 'rect': self._table.rect,
+                    \ 'line_number': cell.content,
+                    \ 'x': cell.x,
+                    \ 'y': cell.y,
+                \ }
+                call self.logger.label('item').log(item)
 
-            call add(items, item)
+                call add(items, item)
+            endfor
         endfor
 
         return items
