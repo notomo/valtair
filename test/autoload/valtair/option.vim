@@ -3,7 +3,7 @@ let s:suite = themis#suite('autoload.valtair.option')
 let s:assert = themis#helper('assert')
 
 function! s:suite.before_each()
-    call ValtairTestBeforeEach()
+    call ValtairTestBeforeEach(s:assert)
 endfunction
 
 function! s:suite.after_each()

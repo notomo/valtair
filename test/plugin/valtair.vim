@@ -3,7 +3,7 @@ let s:suite = themis#suite('plugin.valtair')
 let s:assert = themis#helper('assert')
 
 function! s:suite.before_each()
-    call ValtairTestBeforeEach()
+    call ValtairTestBeforeEach(s:assert)
     filetype on
     syntax enable
 endfunction
@@ -14,59 +14,50 @@ function! s:suite.after_each()
     syntax off
 endfunction
 
-function! s:count_window() abort
-    return tabpagewinnr(tabpagenr(), '$')
-endfunction
-
-function! s:line() abort
-    return getline(line('.'))
-endfunction
-
-function! s:assert.contains(haystack, needle) abort
-    call s:assert.true(count(a:haystack, a:needle) != 0, a:needle . ' must be in the haystack, but actual: ' . a:haystack)
-endfunction
-
 function! s:sync_main(args) abort
     let command = valtair#main(a:args)
     call command.wait()
     return command
 endfunction
 
-function! s:suite.main()
+
+function! s:suite.cmd()
     call s:sync_main('-collector-cmd=ls\ -1')
 
-    call s:assert.true(s:count_window() > 2)
     call s:assert.equals(&filetype, 'valtair')
 endfunction
 
-function! ValtairTest() abort
+
+function! ValtairFuncTest() abort
     return ['hoge', 'foo']
 endfunction
 
 function! s:suite.func()
-    call s:sync_main('-collector=func -collector-func=ValtairTest')
+    call s:sync_main('-collector=func -collector-func=ValtairFuncTest')
 
-    call s:assert.equals(s:count_window(), 3)
+    call s:assert.window_count(3)
 endfunction
 
-function! s:suite.excmd_escaped()
-    call s:sync_main('-collector=excmd -collector-cmd=echomsg\ "hoge"')
 
-    call s:assert.equals(s:count_window(), 2)
-endfunction
-
-command! ValtairTest call s:echomsg()
-function! s:echomsg() abort
+command! ValtairExcommandTest call s:excommand()
+function! s:excommand() abort
     echomsg 'hoge'
     echomsg 'foo'
     echomsg 'bar'
 endfunction
 
 function! s:suite.excmd()
-    call s:sync_main('-collector=excmd -collector-cmd=ValtairTest')
+    call s:sync_main('-collector=excmd -collector-cmd=ValtairExcommandTest')
 
-    call s:assert.equals(s:count_window(), 4)
+    call s:assert.window_count(4)
 endfunction
+
+function! s:suite.excmd_escaped()
+    call s:sync_main('-collector=excmd -collector-cmd=echomsg\ "hoge"')
+
+    call s:assert.window_count(2)
+endfunction
+
 
 function! s:suite.nop_logger()
     call valtair#logger#clear()
@@ -76,17 +67,33 @@ function! s:suite.nop_logger()
     ValtairDo quit
 endfunction
 
+
+command! ValtairQuitTest call s:quit()
+function! s:quit() abort
+    echomsg 'hoge'
+    echomsg 'foo'
+    echomsg 'bar'
+endfunction
+
 function! s:suite.quit()
-    call s:sync_main('-collector=func -collector-func=ValtairTest')
-    call s:assert.equals(s:count_window(), 3)
+    call s:sync_main('-collector=excmd -collector-cmd=ValtairQuitTest')
+    call s:assert.window_count(4)
 
     ValtairDo quit
-    call s:assert.equals(s:count_window(), 1)
+    call s:assert.window_count(1)
+endfunction
+
+
+command! ValtairCursorMovedTest call s:cursor()
+function! s:cursor() abort
+    echomsg 'hoge'
+    echomsg 'foo'
+    echomsg 'bar'
 endfunction
 
 function! s:suite.cursor_moved()
-    call s:sync_main('-collector=func -collector-func=ValtairTest')
-    call s:assert.equals(s:count_window(), 3)
+    call s:sync_main('-collector=excmd -collector-cmd=ValtairCursorMovedTest')
+    call s:assert.window_count(4)
 
     let line_number = line('.')
 
@@ -94,149 +101,4 @@ function! s:suite.cursor_moved()
     doautocmd CursorMoved
 
     call s:assert.equals(line('.'), line_number)
-endfunction
-
-function! s:suite.next_prev()
-    call s:sync_main('-collector=excmd -collector-cmd=ValtairTest')
-    call s:assert.equals(s:count_window(), 4)
-    call s:assert.contains(s:line(), 'hoge')
-
-    ValtairDo next
-    call s:assert.contains(s:line(), 'foo')
-
-    ValtairDo next
-    call s:assert.contains(s:line(), 'bar')
-
-    ValtairDo next
-    call s:assert.contains(s:line(), 'hoge')
-
-    ValtairDo prev
-    call s:assert.contains(s:line(), 'bar')
-
-    ValtairDo prev
-    call s:assert.contains(s:line(), 'foo')
-
-    ValtairDo prev
-    call s:assert.contains(s:line(), 'hoge')
-endfunction
-
-command! ValtairMultiColumnTest call s:many_echomsg()
-function! s:many_echomsg() abort
-    echomsg '0'
-    echomsg '1'
-    echomsg '2'
-    echomsg '3'
-    echomsg '4'
-    echomsg '5'
-    echomsg '6'
-    echomsg '7'
-    echomsg '8'
-    echomsg '9'
-    echomsg '10'
-    echomsg '11'
-endfunction
-
-function! s:suite.left_right()
-    call s:sync_main('-collector=excmd -collector-cmd=ValtairMultiColumnTest')
-    call s:assert.equals(s:count_window(), 13)
-    call s:assert.contains(s:line(), '0')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '9')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '0')
-
-    ValtairDo next
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '6')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '11')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '2')
-
-    ValtairDo next
-    call s:assert.contains(s:line(), '3')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '8')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '4')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '8')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '3')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '7')
-endfunction
-
-command! ValtairHorizontalTest call s:horizontal_echomsg()
-function! s:horizontal_echomsg() abort
-    echomsg '0'
-    echomsg '1'
-    echomsg '2'
-    echomsg '3'
-    echomsg '4'
-    echomsg '5'
-    echomsg '6'
-    echomsg '7'
-    echomsg '8'
-    echomsg '9'
-    echomsg '10'
-    echomsg '11'
-    echomsg '12'
-    echomsg '13'
-endfunction
-
-function! s:suite.horizontal()
-    call s:sync_main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
-    call s:assert.equals(s:count_window(), 15)
-    call s:assert.contains(s:line(), '0')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '2')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '0')
-
-    ValtairDo left
-    call s:assert.contains(s:line(), '13')
-
-    ValtairDo right
-    call s:assert.contains(s:line(), '0')
-
-    ValtairDo down
-    call s:assert.contains(s:line(), '6')
-
-    ValtairDo down
-    call s:assert.contains(s:line(), '12')
-
-    ValtairDo down
-    call s:assert.contains(s:line(), '1')
-
-    ValtairDo up
-    call s:assert.contains(s:line(), '12')
-
-    ValtairDo up
-    call s:assert.contains(s:line(), '6')
-
-    ValtairDo up
-    call s:assert.contains(s:line(), '0')
-
-    ValtairDo up
-    call s:assert.contains(s:line(), '11')
 endfunction

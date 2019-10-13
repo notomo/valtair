@@ -4,14 +4,29 @@ call themis#option('recursive', 1)
 let s:root = getcwd()
 set columns=200
 
-function! ValtairTestBeforeEach() abort
+function! ValtairTestBeforeEach(assert) abort
     execute 'cd' s:root
 
     call valtair#logger#set_func({ msg -> themis#log(msg) })
     call themis#log('')
+
+    function! a:assert.contains_line(needle) abort
+        let line = s:line()
+        call self.true(count(line, a:needle) != 0, a:needle . ' must be in the line, but actual: ' . line)
+    endfunction
+
+    function! a:assert.window_count(count) abort
+        let window_count = tabpagewinnr(tabpagenr(), '$')
+        let message = printf('window count must be %s, but actual: %s', a:count, window_count)
+        call self.equals(window_count, a:count, message)
+    endfunction
 endfunction
 
 function! ValtairTestAfterEach() abort
     silent! %bwipeout!
     call valtair#logger#clear()
+endfunction
+
+function! s:line() abort
+    return getline(line('.'))
 endfunction
