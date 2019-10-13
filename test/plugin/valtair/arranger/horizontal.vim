@@ -32,7 +32,7 @@ function! s:test() abort
     echomsg '13'
 endfunction
 
-function! s:suite.horizontal()
+function! s:suite.right_left()
     let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
     call command.wait()
 
@@ -42,13 +42,43 @@ function! s:suite.horizontal()
     ValtairDo right
     call s:assert.contains_line('1')
 
+    ValtairDo left
+    call s:assert.contains_line('0')
+endfunction
+
+function! s:suite.wrap_right()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
+    call s:assert.contains_line('0')
+
     ValtairDo right
-    call s:assert.contains_line('2')
+    ValtairDo right
+    ValtairDo right
+    ValtairDo right
+    ValtairDo right
+    call s:assert.contains_line('5')
+    ValtairDo right
+    call s:assert.contains_line('6')
+endfunction
+
+function! s:suite.wrap_left()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
+    call s:assert.contains_line('0')
+
+    ValtairDo down
+    call s:assert.contains_line('6')
 
     ValtairDo left
-    call s:assert.contains_line('1')
+    call s:assert.contains_line('5')
+endfunction
 
-    ValtairDo left
+function! s:suite.wrap_wrap_left_right()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
     call s:assert.contains_line('0')
 
     ValtairDo left
@@ -56,14 +86,41 @@ function! s:suite.horizontal()
 
     ValtairDo right
     call s:assert.contains_line('0')
+endfunction
+
+function! s:suite.down_up()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
+    call s:assert.contains_line('0')
+
+    ValtairDo down
+    call s:assert.contains_line('6')
+
+    ValtairDo up
+    call s:assert.contains_line('0')
+endfunction
+
+function! s:suite.wrap_down()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
+    call s:assert.contains_line('0')
 
     ValtairDo down
     call s:assert.contains_line('6')
 
     ValtairDo down
-    call s:assert.contains_line('12')
+    call s:assert.contains_line('1')
+endfunction
 
-    ValtairDo down
+function! s:suite.wrap_up()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
+    call s:assert.contains_line('0')
+
+    ValtairDo right
     call s:assert.contains_line('1')
 
     ValtairDo up
@@ -74,7 +131,17 @@ function! s:suite.horizontal()
 
     ValtairDo up
     call s:assert.contains_line('0')
+endfunction
+
+function! s:suite.wrap_wrap_up_down()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    call command.wait()
+
+    call s:assert.contains_line('0')
 
     ValtairDo up
     call s:assert.contains_line('11')
+
+    ValtairDo down
+    call s:assert.contains_line('0')
 endfunction
