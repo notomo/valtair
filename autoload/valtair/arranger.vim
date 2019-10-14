@@ -74,7 +74,7 @@ function! valtair#arranger#find() abort
             continue
         endif
 
-        let tab_windows = nvim_tabpage_list_wins(tabpagenr())
+        let tab_windows = gettabinfo(tabpagenr())[0]['windows']
         if index(tab_windows, windows[0]) != -1
             return arranger
         endif
