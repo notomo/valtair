@@ -29,6 +29,7 @@ let s:actions = {
 
 function! valtair#do(args) abort
     call valtair#logger#new('valtair#do').log(a:args)
+
     let arranger = valtair#arranger#find()
     if empty(arranger)
         return valtair#messenger#new().warn('not started')
@@ -37,5 +38,6 @@ function! valtair#do(args) abort
     if has_key(s:actions, a:args)
         return s:actions[a:args](arranger)
     endif
+
     return valtair#messenger#new().error('not found action: ' . a:args)
 endfunction
