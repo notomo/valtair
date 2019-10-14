@@ -11,27 +11,26 @@ function! valtair#arranger#new(event_service, impl) abort
         \ 'tiles': [],
         \ 'impl': a:impl,
         \ 'event_service': a:event_service,
-        \ '_bufnr': v:null,
+        \ '_buffer': valtair#buffer#new(a:event_service, a:impl.padding),
         \ 'logger': valtair#logger#new('arranger'),
     \ }
 
     function! arranger.open_tiles(texts) abort
-        let buffer = valtair#buffer#new(self.event_service, a:texts, self.impl.padding)
-        let items = self.impl.items(buffer.line_numbers)
+        let line_numbers = self._buffer.get_line_numbers(a:texts)
+        let items = self.impl.items(line_numbers)
         if empty(items)
             return
         endif
 
-        let self.tiles = map(items, { _, item -> valtair#tile#new(self.event_service, item, buffer.bufnr) })
+        let self.tiles = map(items, { _, item -> valtair#tile#new(self.event_service, item, self._buffer.bufnr) })
         for tile in self.tiles
             call tile.open()
         endfor
 
-        call buffer.fix_cursor()
+        call self._buffer.fix_cursor()
 
-        let s:arrangers[buffer.bufnr] = self
-        call buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
-        let self._bufnr = buffer.bufnr
+        let s:arrangers[self._buffer.bufnr] = self
+        call self._buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
 
         call self.tiles[0].enter()
     endfunction
@@ -67,13 +66,8 @@ function! valtair#arranger#new(event_service, impl) abort
     endfunction
 
     function! arranger.close() abort
-        for tile in self.tiles
-            call tile.close()
-        endfor
+        call self._buffer.wipe()
         let self.tiles = []
-        if !empty(self._bufnr)
-            execute 'silent!' self._bufnr 'bwipeout!'
-        endif
     endfunction
 
     return arranger
