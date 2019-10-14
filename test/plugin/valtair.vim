@@ -136,3 +136,22 @@ function! s:suite.not_found_action()
 
     call s:assert.true(f.called)
 endfunction
+
+
+function! ValtairMultipleTest() abort
+    return ['hoge', 'foo', 'bar']
+endfunction
+
+function! s:suite.execute_multiple()
+    call s:sync_main('-collector=func -collector-func=ValtairMultipleTest')
+    call s:assert.window_count(4)
+
+    ValtairDo down
+    call s:assert.contains_line('foo')
+
+    call s:sync_main('-collector=func -collector-func=ValtairMultipleTest')
+    call s:assert.window_count(4)
+
+    ValtairDo down
+    call s:assert.contains_line('foo')
+endfunction

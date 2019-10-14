@@ -2,10 +2,16 @@
 let s:arrangers = {}
 
 function! valtair#arranger#new(event_service, impl) abort
+    let arranger = valtair#arranger#find()
+    if !empty(arranger)
+        call arranger.close()
+    endif
+
     let arranger = {
         \ 'tiles': [],
         \ 'impl': a:impl,
         \ 'event_service': a:event_service,
+        \ '_bufnr': v:null,
         \ 'logger': valtair#logger#new('arranger'),
     \ }
 
@@ -25,6 +31,7 @@ function! valtair#arranger#new(event_service, impl) abort
 
         let s:arrangers[buffer.bufnr] = self
         call buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
+        let self._bufnr = buffer.bufnr
 
         call self.tiles[0].enter()
     endfunction
@@ -64,6 +71,9 @@ function! valtair#arranger#new(event_service, impl) abort
             call tile.close()
         endfor
         let self.tiles = []
+        if !empty(self._bufnr)
+            execute 'silent!' self._bufnr 'bwipeout!'
+        endif
     endfunction
 
     return arranger
