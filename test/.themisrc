@@ -7,11 +7,12 @@ set columns=200
 function! ValtairTestBeforeEach(assert) abort
     execute 'cd' s:root
 
+    call valtair#messenger#set_func({ msg -> themis#log('[test messanger] ' . msg) })
     call valtair#logger#set_func({ msg -> themis#log(msg) })
     call themis#log('')
 
     function! a:assert.contains_line(needle) abort
-        let line = s:line()
+        let line = getline(line('.'))
         call self.true(count(line, a:needle) != 0, a:needle . ' must be in the line, but actual: ' . line)
     endfunction
 
@@ -25,8 +26,5 @@ endfunction
 function! ValtairTestAfterEach() abort
     silent! %bwipeout!
     call valtair#logger#clear()
-endfunction
-
-function! s:line() abort
-    return getline(line('.'))
+    call valtair#messenger#clear()
 endfunction

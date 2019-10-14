@@ -1,4 +1,6 @@
 
+let s:arrangers = {}
+
 function! valtair#arranger#new(event_service, impl) abort
     let arranger = {
         \ 'tiles': [],
@@ -20,6 +22,7 @@ function! valtair#arranger#new(event_service, impl) abort
         endfor
 
         call buffer.fix_cursor()
+        let s:arrangers[buffer.bufnr] = self
 
         call self.tiles[0].enter()
     endfunction
@@ -62,4 +65,20 @@ function! valtair#arranger#new(event_service, impl) abort
     endfunction
 
     return arranger
+endfunction
+
+function! valtair#arranger#find() abort
+    for [bufnr, arranger] in items(s:arrangers)
+        let windows = win_findbuf(bufnr)
+        if empty(windows)
+            continue
+        endif
+
+        let tab_windows = nvim_tabpage_list_wins(tabpagenr())
+        if index(tab_windows, windows[0]) != -1
+            return arranger
+        endif
+    endfor
+
+    return {}
 endfunction

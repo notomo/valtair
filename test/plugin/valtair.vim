@@ -102,3 +102,37 @@ function! s:suite.cursor_moved()
 
     call s:assert.equals(line('.'), line_number)
 endfunction
+
+
+function! s:suite.not_started()
+    let f = {'called': v:false}
+    function! f.echo(message) abort
+        call valtair#logger#new('output').log(': ' . a:message)
+        let self.called = v:true
+    endfunction
+    call valtair#messenger#set_func({ msg -> f.echo(msg) })
+
+    ValtairDo next
+
+    call s:assert.true(f.called)
+endfunction
+
+command! ValtairNotFoundTest call s:not_found()
+function! s:not_found() abort
+    echomsg 'hoge'
+endfunction
+
+function! s:suite.not_found_action()
+    call s:sync_main('-collector=excmd -collector-cmd=ValtairNotFoundTest')
+
+    let f = {'called': v:false}
+    function! f.echo(message) abort
+        call valtair#logger#new('output').log(': ' . a:message)
+        let self.called = v:true
+    endfunction
+    call valtair#messenger#set_func({ msg -> f.echo(msg) })
+
+    ValtairDo invalid
+
+    call s:assert.true(f.called)
+endfunction

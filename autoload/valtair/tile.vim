@@ -27,6 +27,9 @@ function! valtair#tile#new(event_service, item, bufnr) abort
     endfunction
 
     function! tile.enter() abort
+        if !nvim_win_is_valid(self.window)
+            return
+        endif
         call nvim_set_current_win(self.window)
 
         " FIXME: could not disable CursorLine, CursorColumn highlight
@@ -35,6 +38,9 @@ function! valtair#tile#new(event_service, item, bufnr) abort
     endfunction
 
     function! tile.close() abort
+        if !nvim_win_is_valid(self.window)
+            return
+        endif
         call nvim_win_close(self.window, v:false)
     endfunction
 
