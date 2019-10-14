@@ -26,5 +26,9 @@ function! valtair#buffer#new(event_service, texts, padding) abort
         call self.event_service.fix_window_cursor(self.bufnr)
     endfunction
 
+    function! buffer.on_wiped(callback) abort
+        call self.event_service.on_buffer_wiped(self.bufnr, a:callback)
+    endfunction
+
     return buffer
 endfunction

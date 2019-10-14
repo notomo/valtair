@@ -4,6 +4,7 @@ let s:COLLECTOR_FINISHED = 'ValtairCollectorFinished'
 let s:WINDOW_CURSOR_MOVED = 'ValtairWindowCursorMoved'
 
 let s:callbacks = {}
+let s:buffer_callbacks = {}
 
 function! valtair#event#service() abort
     let service = {
@@ -16,6 +17,16 @@ function! valtair#event#service() abort
 
     function! service.on_collector_finished(id, callback) abort
         call self._on_event(s:COLLECTOR_FINISHED, a:id, a:callback, v:true)
+    endfunction
+
+    function! service.on_buffer_wiped(bufnr, callback) abort
+        call self._on_buffer_event('BufWipeout', a:bufnr, a:callback)
+    endfunction
+
+    function! service._on_buffer_event(event_name, bufnr, callback) abort
+        let buffer_event_name = self._buffer_event_name(a:event_name, a:bufnr)
+        let s:buffer_callbacks[buffer_event_name] = a:callback
+        execute printf('autocmd %s <buffer=%s> call s:buffer_callback("%s", %s)', a:event_name, a:bufnr, buffer_event_name, a:bufnr)
     endfunction
 
     function! service.on_moved_window_cursor(id, callback, bufnr) abort
@@ -84,6 +95,11 @@ function! s:callback(amatch, event_name, once) abort
     if a:once
         call remove(s:callbacks[a:event_name], id)
     endif
+endfunction
+
+function! s:buffer_callback(buffer_event_name, bufnr) abort
+    call s:buffer_callbacks[a:buffer_event_name](a:bufnr)
+    call remove(s:buffer_callbacks, a:buffer_event_name)
 endfunction
 
 function! s:clean_group(group_name) abort

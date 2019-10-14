@@ -22,7 +22,9 @@ function! valtair#arranger#new(event_service, impl) abort
         endfor
 
         call buffer.fix_cursor()
+
         let s:arrangers[buffer.bufnr] = self
+        call buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
 
         call self.tiles[0].enter()
     endfunction
