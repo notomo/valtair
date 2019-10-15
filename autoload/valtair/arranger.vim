@@ -53,13 +53,14 @@ function! valtair#arranger#new(event_service, impl) abort
 endfunction
 
 function! valtair#arranger#find() abort
+    let tab_windows = gettabinfo(tabpagenr())[0]['windows']
+
     for [bufnr, arranger] in items(s:arrangers)
         let windows = win_findbuf(bufnr)
         if empty(windows)
             continue
         endif
 
-        let tab_windows = gettabinfo(tabpagenr())[0]['windows']
         if index(tab_windows, windows[0]) != -1
             return arranger
         endif
