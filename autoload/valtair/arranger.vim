@@ -32,46 +32,15 @@ function! valtair#arranger#new(event_service, impl) abort
         let s:arrangers[self._buffer.bufnr] = self
         call self._buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
 
-        call self.enter_first()
+        call self.enter('first')
     endfunction
 
-    function! arranger.enter_first() abort
-        let index = self.impl.first()
-        call self.tiles[index].enter()
-    endfunction
+    function! arranger.enter(name) abort
+        if !has_key(self.impl, a:name)
+            return valtair#messenger#new().warn('not implemented action: ' . a:name)
+        endif
 
-    function! arranger.enter_last() abort
-        let index = self.impl.last()
-        call self.tiles[index].enter()
-    endfunction
-
-    function! arranger.enter_next() abort
-        let index = self.impl.next()
-        call self.tiles[index].enter()
-    endfunction
-
-    function! arranger.enter_prev() abort
-        let index = self.impl.prev()
-        call self.tiles[index].enter()
-    endfunction
-
-    function! arranger.enter_right() abort
-        let index = self.impl.right()
-        call self.tiles[index].enter()
-    endfunction
-
-    function! arranger.enter_left() abort
-        let index = self.impl.left()
-        call self.tiles[index].enter()
-    endfunction
-
-    function! arranger.enter_down() abort
-        let index = self.impl.down()
-        call self.tiles[index].enter()
-    endfunction
-
-    function! arranger.enter_up() abort
-        let index = self.impl.up()
+        let index = self.impl[a:name]()
         call self.tiles[index].enter()
     endfunction
 

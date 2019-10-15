@@ -18,14 +18,14 @@ function! valtair#main(args) abort
 endfunction
 
 let s:actions = {
-    \ 'first': { arranger -> arranger.enter_first() },
-    \ 'last': { arranger -> arranger.enter_last() },
-    \ 'next': { arranger -> arranger.enter_next() },
-    \ 'prev': { arranger -> arranger.enter_prev() },
-    \ 'up': { arranger -> arranger.enter_up() },
-    \ 'down': { arranger -> arranger.enter_down() },
-    \ 'left': { arranger -> arranger.enter_left() },
-    \ 'right': { arranger -> arranger.enter_right() },
+    \ 'first': { arranger -> arranger.enter('first') },
+    \ 'last': { arranger -> arranger.enter('last') },
+    \ 'next': { arranger -> arranger.enter('next') },
+    \ 'prev': { arranger -> arranger.enter('prev') },
+    \ 'up': { arranger -> arranger.enter('up') },
+    \ 'down': { arranger -> arranger.enter('down') },
+    \ 'left': { arranger -> arranger.enter('left') },
+    \ 'right': { arranger -> arranger.enter('right') },
     \ 'quit': { arranger -> arranger.close() },
 \ }
 
