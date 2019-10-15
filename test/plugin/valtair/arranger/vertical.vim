@@ -138,3 +138,22 @@ function! s:suite.wrap_wrap_up_down()
     ValtairDo down
     call s:assert.contains_line('0')
 endfunction
+
+function! s:suite.first()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairVerticalTest')
+    call command.wait()
+
+    call s:assert.contains_line('0')
+
+    ValtairDo first
+    call s:assert.contains_line('0')
+
+    ValtairDo right
+    call s:assert.contains_line('5')
+
+    ValtairDo first
+    call s:assert.contains_line('0')
+
+    ValtairDo right
+    call s:assert.contains_line('5')
+endfunction

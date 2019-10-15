@@ -18,6 +18,7 @@ function! valtair#main(args) abort
 endfunction
 
 let s:actions = {
+    \ 'first': { arranger -> arranger.enter_first() },
     \ 'next': { arranger -> arranger.enter_next() },
     \ 'prev': { arranger -> arranger.enter_prev() },
     \ 'up': { arranger -> arranger.enter_up() },

@@ -92,8 +92,7 @@ function! valtair#table#editor(cell_rect, margin) abort
     endfunction
 
     function! table.wrap_right() abort
-        let current = self._current
-        call self.logger.label('current').log(current)
+        let current = self._get_current()
 
         let column = (current.column + 1) % len(self._cells)
         let row = current.row
@@ -167,15 +166,22 @@ function! valtair#table#editor(cell_rect, margin) abort
         return self._cells[column][row].index
     endfunction
 
+    function! table.first() abort
+        call self._set_current(0, 0)
+        let current = self._get_current()
+
+        return self._cells[current.column][current.row].index
+    endfunction
+
     function! table._get_current() abort
-        call self.logger.label('current').log(self._current)
+        call self.logger.label('get current').log(self._current)
         return self._current
     endfunction
 
     function! table._set_current(row, column) abort
         let self._current.row = a:row
         let self._current.column = a:column
-        call self.logger.label('new current').log(self._current)
+        call self.logger.label('set current').log(self._current)
     endfunction
 
     return table

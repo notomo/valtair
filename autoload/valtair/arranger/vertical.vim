@@ -31,6 +31,10 @@ function! valtair#arranger#vertical#new(options) abort
         return items
     endfunction
 
+    function! arranger.first() abort
+        return self._table.first()
+    endfunction
+
     function! arranger.next() abort
         return self.down()
     endfunction
