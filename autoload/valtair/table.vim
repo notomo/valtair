@@ -6,6 +6,7 @@ function! valtair#table#editor(cell_rect, margin) abort
         \ '_cells': [],
         \ '_row_count': 0,
         \ '_cell_count': 0,
+        \ '_last_cell': v:null,
         \ '_current': {
             \ 'row': 0,
             \ 'column': 0,
@@ -44,7 +45,7 @@ function! valtair#table#editor(cell_rect, margin) abort
             let index += 1
         endfor
 
-        call self._set_cells(cells)
+        call self._set_cells(cells, cell)
 
         return cells
     endfunction
@@ -72,12 +73,12 @@ function! valtair#table#editor(cell_rect, margin) abort
             let index += 1
         endfor
 
-        call self._set_cells(cells)
+        call self._set_cells(cells, cell)
 
         return cells
     endfunction
 
-    function! table._set_cells(cells) abort
+    function! table._set_cells(cells, last_cell) abort
         let self._cell_count = 0
         for rows in a:cells
             let self._cell_count += len(rows)
@@ -89,6 +90,8 @@ function! valtair#table#editor(cell_rect, margin) abort
 
         let self._cells = filter(a:cells, { _, v -> !empty(v) })
         call self.logger.label('cells').logs(self._cells)
+
+        let self._last_cell = a:last_cell
     endfunction
 
     function! table.wrap_right() abort
@@ -171,6 +174,15 @@ function! valtair#table#editor(cell_rect, margin) abort
         let current = self._get_current()
 
         return self._cells[current.column][current.row].index
+    endfunction
+
+    function! table.last() abort
+        let last = self._last_cell
+        let row = last.row_index
+        let column = last.col_index
+        call self._set_current(row, column)
+
+        return self._cells[column][row].index
     endfunction
 
     function! table._get_current() abort

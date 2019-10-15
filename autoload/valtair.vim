@@ -19,6 +19,7 @@ endfunction
 
 let s:actions = {
     \ 'first': { arranger -> arranger.enter_first() },
+    \ 'last': { arranger -> arranger.enter_last() },
     \ 'next': { arranger -> arranger.enter_next() },
     \ 'prev': { arranger -> arranger.enter_prev() },
     \ 'up': { arranger -> arranger.enter_up() },

@@ -38,6 +38,10 @@ function! valtair#arranger#horizontal#new(options) abort
         return self._table.first()
     endfunction
 
+    function! arranger.last() abort
+        return self._table.last()
+    endfunction
+
     function! arranger.next() abort
         return self.right()
     endfunction

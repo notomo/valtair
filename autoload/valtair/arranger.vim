@@ -40,6 +40,11 @@ function! valtair#arranger#new(event_service, impl) abort
         call self.tiles[index].enter()
     endfunction
 
+    function! arranger.enter_last() abort
+        let index = self.impl.last()
+        call self.tiles[index].enter()
+    endfunction
+
     function! arranger.enter_next() abort
         let index = self.impl.next()
         call self.tiles[index].enter()
