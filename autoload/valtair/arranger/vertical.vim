@@ -1,6 +1,6 @@
 
 function! valtair#arranger#vertical#new(options) abort
-    let width = 30
+    let width = a:options.width
     let top_bottom = 1
     let padding = valtair#padding#new(top_bottom).with_width(width)
     let rect = valtair#rect#new(width, padding.height)

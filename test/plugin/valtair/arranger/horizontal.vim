@@ -33,7 +33,7 @@ function! s:test() abort
 endfunction
 
 function! s:suite.right_left()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.window_count(15)
@@ -47,7 +47,7 @@ function! s:suite.right_left()
 endfunction
 
 function! s:suite.wrap_right()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -63,7 +63,7 @@ function! s:suite.wrap_right()
 endfunction
 
 function! s:suite.wrap_left()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -76,7 +76,7 @@ function! s:suite.wrap_left()
 endfunction
 
 function! s:suite.wrap_wrap_left_right()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -89,7 +89,7 @@ function! s:suite.wrap_wrap_left_right()
 endfunction
 
 function! s:suite.down_up()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -102,7 +102,7 @@ function! s:suite.down_up()
 endfunction
 
 function! s:suite.wrap_down()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -115,7 +115,7 @@ function! s:suite.wrap_down()
 endfunction
 
 function! s:suite.wrap_up()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -134,7 +134,7 @@ function! s:suite.wrap_up()
 endfunction
 
 function! s:suite.wrap_wrap_up_down()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -147,7 +147,7 @@ function! s:suite.wrap_wrap_up_down()
 endfunction
 
 function! s:suite.first()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -166,7 +166,7 @@ function! s:suite.first()
 endfunction
 
 function! s:suite.last()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest --arranger=horizontal')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
     call command.wait()
 
     call s:assert.contains_line('0')
@@ -185,4 +185,23 @@ function! s:suite.last()
 
     ValtairDo up
     call s:assert.contains_line('7')
+endfunction
+
+command! ValtairHorizontalWidthTest call s:width_test()
+function! s:width_test() abort
+    echomsg '0'
+endfunction
+
+function! s:suite.width()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalWidthTest -arranger=horizontal -arranger-width=10')
+    call command.wait()
+
+    call s:assert.window_width(10)
+endfunction
+
+function! s:suite.large_width()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalWidthTest -arranger-width=500')
+    call command.wait()
+
+    call s:assert.window_count(1)
 endfunction

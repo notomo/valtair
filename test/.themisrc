@@ -16,6 +16,11 @@ function! ValtairTestBeforeEach(assert) abort
         call self.true(count(line, a:needle) != 0, a:needle . ' must be in the line, but actual: ' . line)
     endfunction
 
+    function! a:assert.window_width(width) abort
+        let actual = winwidth(0)
+        call self.true(actual == a:width, 'The width of the window should be ' . a:width . ', but actual: ' . actual)
+    endfunction
+
     function! a:assert.window_count(count) abort
         let window_count = tabpagewinnr(tabpagenr(), '$')
         let message = printf('window count must be %s, but actual: %s', a:count, window_count)

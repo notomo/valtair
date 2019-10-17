@@ -6,7 +6,9 @@ let s:options = {
     \ },
     \ 'arranger': {
         \ 'name': 'vertical',
-        \ 'options': {},
+        \ 'options': {
+            \ 'width': 30,
+        \ },
     \ }
 \ }
 
@@ -26,8 +28,15 @@ function! valtair#option#parse(raw_args) abort
         endif
     endfor
 
+    let options.arranger.options.width = str2nr(options.arranger.options.width)
+    if options.arranger.options.width <= 0
+        let err = 'invalid arranger width: ' . options.arranger.options.width
+        return [v:null, err]
+    endif
+
     call valtair#logger#new('option').log(options)
-    return options
+
+    return [options, v:null]
 endfunction
 
 function! valtair#option#parse_one(factor) abort

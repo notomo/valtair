@@ -25,6 +25,7 @@ function! valtair#table#editor(cell_rect, margin) abort
     function! table.make_cells_vertically(contents) abort
         let cells = map(range(self._max_column_count), { _k, _v -> [] })
         let index = 0
+        let cell = {}
         for content in a:contents
             let col_index = index / self._max_row_count
             if col_index >= self._max_column_count
@@ -45,6 +46,9 @@ function! valtair#table#editor(cell_rect, margin) abort
             let index += 1
         endfor
 
+        if empty(cell)
+            return []
+        endif
         call self._set_cells(cells, cell)
 
         return cells
@@ -53,6 +57,7 @@ function! valtair#table#editor(cell_rect, margin) abort
     function! table.make_cells_horizontally(contents) abort
         let cells = map(range(self._max_column_count), { _k, _v -> [] })
         let index = 0
+        let cell = {}
         for content in a:contents
             let row_index = index / self._max_column_count
             if row_index >= self._max_row_count
@@ -73,6 +78,9 @@ function! valtair#table#editor(cell_rect, margin) abort
             let index += 1
         endfor
 
+        if empty(cell)
+            return []
+        endif
         call self._set_cells(cells, cell)
 
         return cells

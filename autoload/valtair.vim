@@ -1,6 +1,9 @@
 
 function! valtair#main(args) abort
-    let options = valtair#option#parse(a:args)
+    let [options, err] = valtair#option#parse(a:args)
+    if !empty(err)
+        return valtair#messenger#new().error(err)
+    endif
 
     let event_service = valtair#event#service()
     let loader = valtair#loader#new()
