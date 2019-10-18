@@ -1,8 +1,8 @@
 
 function! valtair#arranger#horizontal#new(options) abort
     let width = a:options.width
-    let top_bottom = 1
-    let padding = valtair#padding#new(top_bottom).with_width(width)
+    let row_padding = a:options.row_padding
+    let padding = valtair#padding#new(row_padding).with_width(width)
     let rect = valtair#rect#new(width, padding.height)
     let margin = 1
 

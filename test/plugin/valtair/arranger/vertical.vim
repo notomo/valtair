@@ -179,3 +179,26 @@ function! s:suite.large_width()
 
     call s:assert.window_count(1)
 endfunction
+
+command! ValtairVerticalPaddingTest call s:padding_test()
+function! s:padding_test() abort
+    echomsg '0'
+    echomsg '1'
+endfunction
+
+function! s:suite.row_padding()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairVerticalPaddingTest -arranger-row-padding=3')
+    call command.wait()
+
+    call s:assert.window_height(7)
+
+    ValtairDo next
+    call s:assert.window_height(7)
+endfunction
+
+function! s:suite.large_row_padding()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairVerticalPaddingTest -arranger-row-padding=100')
+    call command.wait()
+
+    call s:assert.window_count(1)
+endfunction

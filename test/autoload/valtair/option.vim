@@ -26,6 +26,20 @@ function! s:suite.parse_escaped()
     call s:assert.equals(options.collector.options.cmd, 'ls\')
 endfunction
 
+function! s:suite.row_padding()
+    let [options, err] = valtair#option#parse('-arranger-row-padding=3')
+
+    call s:assert.empty(err)
+    call s:assert.equals(options.arranger.options.row_padding, 3)
+endfunction
+
+function! s:suite.invalid_row_padding()
+    let [options, err] = valtair#option#parse('-arranger-row-padding=-1')
+
+    call themis#log('[test messanger] ' . err)
+    call s:assert.not_empty(err)
+endfunction
+
 function! s:suite.invalid_width()
     let [options, err] = valtair#option#parse('-arranger-width=0')
 

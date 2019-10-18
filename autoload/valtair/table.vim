@@ -23,7 +23,11 @@ function! valtair#table#editor(cell_rect, margin) abort
     call table.logger.log('max column count: ' . table._max_column_count)
 
     function! table.make_cells_vertically(contents) abort
+        if self._max_column_count == 0 || self._max_row_count == 0
+            return []
+        endif
         let cells = map(range(self._max_column_count), { _k, _v -> [] })
+
         let index = 0
         let cell = {}
         for content in a:contents
@@ -55,7 +59,11 @@ function! valtair#table#editor(cell_rect, margin) abort
     endfunction
 
     function! table.make_cells_horizontally(contents) abort
+        if self._max_column_count == 0 || self._max_row_count == 0
+            return []
+        endif
         let cells = map(range(self._max_column_count), { _k, _v -> [] })
+
         let index = 0
         let cell = {}
         for content in a:contents

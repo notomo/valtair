@@ -200,7 +200,30 @@ function! s:suite.width()
 endfunction
 
 function! s:suite.large_width()
-    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalWidthTest -arranger-width=500')
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalWidthTest -arranger=horizontal -arranger-width=500')
+    call command.wait()
+
+    call s:assert.window_count(1)
+endfunction
+
+command! ValtairHorizontalPaddingTest call s:padding_test()
+function! s:padding_test() abort
+    echomsg '0'
+    echomsg '1'
+endfunction
+
+function! s:suite.row_padding()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalPaddingTest -arranger=horizontal -arranger-row-padding=3')
+    call command.wait()
+
+    call s:assert.window_height(7)
+
+    ValtairDo next
+    call s:assert.window_height(7)
+endfunction
+
+function! s:suite.large_row_padding()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalPaddingTest -arranger=horizontal -arranger-row-padding=100')
     call command.wait()
 
     call s:assert.window_count(1)

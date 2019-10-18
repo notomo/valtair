@@ -1,10 +1,10 @@
 
-function! valtair#padding#new(top_bottom) abort
+function! valtair#padding#new(row_padding) abort
     let padding = {
         \ '_left_space': '',
         \ '_width': 0,
-        \ 'lines': repeat([''], a:top_bottom),
-        \ 'height':  a:top_bottom + 1 + a:top_bottom,
+        \ 'lines': repeat([''], a:row_padding),
+        \ 'height':  a:row_padding + 1 + a:row_padding,
     \ }
 
     function! padding.add_left(text) abort
