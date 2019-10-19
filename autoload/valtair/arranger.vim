@@ -8,9 +8,8 @@ function! valtair#arranger#new(event_service, impl) abort
     endif
 
     let arranger = {
-        \ 'tiles': [],
         \ 'impl': a:impl,
-        \ 'event_service': a:event_service,
+        \ '_tiles': valtair#tiles#new(a:event_service),
         \ '_buffer': valtair#buffer#new(a:event_service, a:impl.padding),
         \ 'logger': valtair#logger#new('arranger'),
     \ }
@@ -21,11 +20,7 @@ function! valtair#arranger#new(event_service, impl) abort
         if empty(items)
             return
         endif
-
-        let self.tiles = map(items, { _, item -> valtair#tile#new(self.event_service, item, self._buffer.bufnr) })
-        for tile in self.tiles
-            call tile.open()
-        endfor
+        call self._tiles.open(items, self._buffer.bufnr)
 
         call self._buffer.fix_cursor()
 
@@ -41,12 +36,12 @@ function! valtair#arranger#new(event_service, impl) abort
         endif
 
         let index = self.impl[a:name]()
-        call self.tiles[index].enter()
+        call self._tiles.enter(index)
     endfunction
 
     function! arranger.close() abort
         call self._buffer.wipe()
-        let self.tiles = []
+        call self._tiles.clear()
     endfunction
 
     return arranger
