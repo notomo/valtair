@@ -26,15 +26,13 @@ function! valtair#table#editor(cell_rect, margin) abort
         if self._max_column_count == 0 || self._max_row_count == 0
             return []
         endif
-        let cells = map(range(self._max_column_count), { _k, _v -> [] })
+        let column_number = float2nr(ceil(len(a:contents)))
+        let cells = map(range(column_number), { _k, _v -> [] })
 
         let index = 0
         let cell = {}
         for content in a:contents
             let col_index = index / self._max_row_count
-            if col_index >= self._max_column_count
-                break
-            endif
             let row_index = index % self._max_row_count
 
             let cell = {
@@ -42,7 +40,7 @@ function! valtair#table#editor(cell_rect, margin) abort
                 \ 'index': index,
                 \ 'col_index': col_index,
                 \ 'row_index': row_index,
-                \ 'x': (self.rect.width + self._margin) * col_index + 1,
+                \ 'x': (self.rect.width + self._margin) * col_index,
                 \ 'y': (self.rect.height + self._margin) * row_index + 1,
             \ }
             call add(cells[col_index], cell)
@@ -62,15 +60,13 @@ function! valtair#table#editor(cell_rect, margin) abort
         if self._max_column_count == 0 || self._max_row_count == 0
             return []
         endif
-        let cells = map(range(self._max_column_count), { _k, _v -> [] })
+        let column_number = float2nr(ceil(len(a:contents)))
+        let cells = map(range(column_number), { _k, _v -> [] })
 
         let index = 0
         let cell = {}
         for content in a:contents
             let row_index = index / self._max_column_count
-            if row_index >= self._max_row_count
-                break
-            endif
             let col_index = index % self._max_column_count
 
             let cell = {
@@ -78,7 +74,7 @@ function! valtair#table#editor(cell_rect, margin) abort
                 \ 'index': index,
                 \ 'col_index': col_index,
                 \ 'row_index': row_index,
-                \ 'x': (self.rect.width + self._margin) * col_index + 1,
+                \ 'x': (self.rect.width + self._margin) * col_index,
                 \ 'y': (self.rect.height + self._margin) * row_index + 1,
             \ }
             call add(cells[col_index], cell)
