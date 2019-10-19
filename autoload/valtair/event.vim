@@ -2,6 +2,7 @@
 let s:JOB_FINISHED = 'ValtairJobFinished'
 let s:COLLECTOR_FINISHED = 'ValtairCollectorFinished'
 let s:WINDOW_CURSOR_MOVED = 'ValtairWindowCursorMoved'
+let s:WINDOW_ENTERED = 'ValtairWindowEntered'
 
 let s:callbacks = {}
 let s:buffer_callbacks = {}
@@ -33,6 +34,10 @@ function! valtair#event#service() abort
         call self._buffer_group_event(s:WINDOW_CURSOR_MOVED, a:id, a:callback, a:bufnr)
     endfunction
 
+    function! service.on_window_entered(id, callback, bufnr) abort
+        call self._buffer_group_event(s:WINDOW_ENTERED, a:id, a:callback, a:bufnr)
+    endfunction
+
     function! service._buffer_group_event(event_name, id, callback, bufnr) abort
         let group_name = self._buffer_event_name(a:event_name, a:bufnr)
         execute 'augroup' group_name
@@ -48,6 +53,13 @@ function! valtair#event#service() abort
         execute printf('autocmd CursorMoved <buffer=%s> ++nested call valtair#event#service().window_cursor_moved(%s)', a:bufnr, a:bufnr)
 
         let event_name = self._buffer_event_name(s:WINDOW_CURSOR_MOVED, a:bufnr)
+        execute printf('autocmd BufWipeout <buffer=%s> call s:clean_group("%s")', a:bufnr, event_name)
+    endfunction
+
+    function! service.fix_window_options(bufnr) abort
+        execute printf('autocmd WinEnter <buffer=%s> ++nested call valtair#event#service().window_entered(%s)', a:bufnr, a:bufnr)
+
+        let event_name = self._buffer_event_name(s:WINDOW_ENTERED, a:bufnr)
         execute printf('autocmd BufWipeout <buffer=%s> call s:clean_group("%s")', a:bufnr, event_name)
     endfunction
 
@@ -76,6 +88,12 @@ function! valtair#event#service() abort
     function! service.window_cursor_moved(bufnr) abort
         let id = win_getid()
         let event_name = self._buffer_event_name(s:WINDOW_CURSOR_MOVED, a:bufnr)
+        call self._emit(event_name, id)
+    endfunction
+
+    function! service.window_entered(bufnr) abort
+        let id = win_getid()
+        let event_name = self._buffer_event_name(s:WINDOW_ENTERED, a:bufnr)
         call self._emit(event_name, id)
     endfunction
 

@@ -15,7 +15,7 @@ function! valtair#tile#new(event_service, item, bufnr) abort
             \ 'row': self.item.y,
             \ 'col': self.item.x,
             \ 'anchor': 'NW',
-            \ 'focusable': v:false,
+            \ 'focusable': v:true,
             \ 'external': v:false,
             \ 'style': 'minimal',
         \ })
@@ -25,6 +25,7 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         call nvim_win_set_var(self.window, '&scrolloff', 999)
 
         call self.event_service.on_moved_window_cursor(self.window, { id -> nvim_win_set_cursor(self.window, [self.item.line_number, 0]) }, self.bufnr)
+        call self.event_service.on_window_entered(self.window, { id -> self._set_options() }, self.bufnr)
     endfunction
 
     function! tile.enter() abort
@@ -32,7 +33,9 @@ function! valtair#tile#new(event_service, item, bufnr) abort
             return
         endif
         call nvim_set_current_win(self.window)
+    endfunction
 
+    function! tile._set_options() abort
         " FIXME: could not disable CursorLine, CursorColumn highlight
         call nvim_win_set_option(self.window, 'cursorline', v:false)
         call nvim_win_set_option(self.window, 'cursorcolumn', v:false)
