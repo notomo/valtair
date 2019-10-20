@@ -85,6 +85,24 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         return empty(self.window) || !nvim_win_is_valid(self.window)
     endfunction
 
+    function! tile.displayed_all(offset) abort
+        if self.closed()
+            return v:false
+        endif
+
+        let col = self.x - a:offset.x
+        if col < 0 || col + self.width > &columns
+            return v:false
+        endif
+
+        let row = self.y - a:offset.y
+        if row <= 0 || row + self.height > &lines - &cmdheight
+            return v:false
+        endif
+
+        return v:true
+    endfunction
+
     function! tile._set_position(row, col, width, height) abort
         call nvim_win_set_config(self.window, {
             \ 'relative': 'editor',
