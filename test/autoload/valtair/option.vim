@@ -46,3 +46,31 @@ function! s:suite.invalid_width()
     call themis#log('[test messanger] ' . err)
     call s:assert.not_empty(err)
 endfunction
+
+function! s:suite.max_row()
+    let [options, err] = valtair#option#parse('-arranger-max-row=1')
+
+    call s:assert.empty(err)
+    call s:assert.equals(options.arranger.options.max_row, 1)
+endfunction
+
+function! s:suite.invalid_max_row()
+    let [options, err] = valtair#option#parse('-arranger-max-row=0')
+
+    call themis#log('[test messanger] ' . err)
+    call s:assert.not_empty(err)
+endfunction
+
+function! s:suite.max_column()
+    let [options, err] = valtair#option#parse('-arranger-max-column=1')
+
+    call s:assert.empty(err)
+    call s:assert.equals(options.arranger.options.max_column, 1)
+endfunction
+
+function! s:suite.invalid_max_column()
+    let [options, err] = valtair#option#parse('-arranger-max-column=0')
+
+    call themis#log('[test messanger] ' . err)
+    call s:assert.not_empty(err)
+endfunction

@@ -10,11 +10,12 @@ function! valtair#arranger#horizontal#new(options) abort
         \ 'logger': valtair#logger#new('arranger.horizontal'),
         \ 'padding': padding,
         \ '_table': valtair#table#editor(rect, margin),
+        \ '_max_column': a:options.max_column,
     \ }
 
     function! arranger.items(line_numbers) abort
         let items = []
-        for rows in self._table.make_cells_horizontally(a:line_numbers)
+        for rows in self._table.make_cells_horizontally(a:line_numbers, self._max_column)
             for cell in rows
                 let item = {
                     \ 'rect': self._table.rect,

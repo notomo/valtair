@@ -14,26 +14,22 @@ function! valtair#table#editor(cell_rect, margin) abort
         \ 'logger': valtair#logger#new('table'),
     \ }
 
-    let lines = &lines - &cmdheight
-    let table['_max_row_count'] = lines / (table.rect.height + table._margin)
-    call table.logger.log('max row count: ' . table._max_row_count)
+    function! table.make_cells_vertically(contents, max_row_count) abort
+        let lines = &lines - &cmdheight
+        let max_row_count = !empty(a:max_row_count) ? a:max_row_count : lines / (self.rect.height + self._margin)
+        call self.logger.log('max row count: ' . max_row_count)
 
-    let columns = &columns
-    let table['_max_column_count'] = columns / (table.rect.width + table._margin)
-    call table.logger.log('max column count: ' . table._max_column_count)
-
-    function! table.make_cells_vertically(contents) abort
-        if self._max_column_count == 0 || self._max_row_count == 0
+        if max_row_count == 0
             return []
         endif
-        let column_number = float2nr(ceil(len(a:contents)))
+        let column_number = float2nr(ceil(str2float(len(a:contents)) / max_row_count))
         let cells = map(range(column_number), { _k, _v -> [] })
 
         let index = 0
         let cell = {}
         for content in a:contents
-            let col_index = index / self._max_row_count
-            let row_index = index % self._max_row_count
+            let col_index = index / max_row_count
+            let row_index = index % max_row_count
 
             let cell = {
                 \ 'content': content,
@@ -56,18 +52,20 @@ function! valtair#table#editor(cell_rect, margin) abort
         return cells
     endfunction
 
-    function! table.make_cells_horizontally(contents) abort
-        if self._max_column_count == 0 || self._max_row_count == 0
+    function! table.make_cells_horizontally(contents, max_column_count) abort
+        let max_column_count = !empty(a:max_column_count) ? a:max_column_count : &columns / (self.rect.width + self._margin)
+        call self.logger.log('max column count: ' . max_column_count)
+
+        if max_column_count == 0
             return []
         endif
-        let column_number = float2nr(ceil(len(a:contents)))
-        let cells = map(range(column_number), { _k, _v -> [] })
+        let cells = map(range(max_column_count), { _k, _v -> [] })
 
         let index = 0
         let cell = {}
         for content in a:contents
-            let row_index = index / self._max_column_count
-            let col_index = index % self._max_column_count
+            let row_index = index / max_column_count
+            let col_index = index % max_column_count
 
             let cell = {
                 \ 'content': content,

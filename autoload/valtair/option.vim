@@ -9,6 +9,8 @@ let s:options = {
         \ 'options': {
             \ 'width': 30,
             \ 'row_padding': 1,
+            \ 'max_row': v:null,
+            \ 'max_column': v:null,
         \ },
     \ }
 \ }
@@ -30,15 +32,27 @@ function! valtair#option#parse(raw_args) abort
         endif
     endfor
 
-    let options.arranger.options.width = str2nr(options.arranger.options.width)
-    if options.arranger.options.width <= 0
-        let err = 'invalid arranger width: ' . options.arranger.options.width
+    let [options.arranger.options.width, err] = s:positive_number(options.arranger.options.width)
+    if !empty(err)
+        let err = 'invalid arranger width: ' . err
         return [v:null, err]
     endif
 
-    let options.arranger.options.row_padding = str2nr(options.arranger.options.row_padding)
-    if options.arranger.options.row_padding < 0
-        let err = 'invalid arranger row_padding: ' . options.arranger.options.row_padding
+    let [options.arranger.options.row_padding, err] = s:not_negative_number(options.arranger.options.row_padding)
+    if !empty(err)
+        let err = 'invalid arranger row_padding: ' . err
+        return [v:null, err]
+    endif
+
+    let [options.arranger.options.max_row, err] = s:optional_positive_number(options.arranger.options.max_row)
+    if !empty(err)
+        let err = 'invalid arranger max_row: ' . err
+        return [v:null, err]
+    endif
+
+    let [options.arranger.options.max_column, err] = s:optional_positive_number(options.arranger.options.max_column)
+    if !empty(err)
+        let err = 'invalid arranger max_column: ' . err
         return [v:null, err]
     endif
 
@@ -62,3 +76,31 @@ function! valtair#option#parse_one(factor) abort
     let [key] = key_value
     return [key, v:true]
 endfunction
+
+function! s:positive_number(value) abort
+    let number = str2nr(a:value)
+    if number <= 0
+        let err = 'should be positive number: ' . number
+        return [v:null, err]
+    endif
+    return [number, v:null]
+endfunction
+
+function! s:not_negative_number(value) abort
+    let number = str2nr(a:value)
+    if number < 0
+        let err = 'should not be negative number: ' . number
+        return [v:null, err]
+    endif
+    return [number, v:null]
+endfunction
+
+function! s:optional_positive_number(value) abort
+    let number = type(a:value) != v:t_string && a:value == v:null ? v:null : str2nr(a:value)
+    if type(number) == v:t_number && number <= 0
+        let err = 'should be null or positive number: ' . number
+        return [v:null, err]
+    endif
+    return [number, v:null]
+endfunction
+
