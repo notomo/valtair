@@ -14,23 +14,37 @@ function! valtair#tile#new(event_service, item, bufnr) abort
     function! tile.open(offset) abort
         let row = self.y - a:offset.y
         let lines = &lines - &cmdheight
-        if lines < row + self.height || row < 0
+        if lines < row || row + self.height < 0
             return v:true
         endif
 
         let col = self.x - a:offset.x
-        if &columns < col + self.width || col < 0
+        if &columns <= col || col + self.width < 0
             return v:true
         endif
 
+        let height = self.height
+        if lines > row && row + self.height > lines
+            let height = lines - row
+        elseif row < 0
+            let height = self.height + row
+        endif
+
+        let width = self.width
+        if &columns > col && col + self.width > &columns
+            let width = &columns - col
+        elseif col < 0
+            let width = self.width + col
+        endif
+
         if !self.closed()
-            return self._set_position(row, col)
+            return self._set_position(row, col, width, height)
         endif
 
         let self.window = nvim_open_win(self.bufnr, v:false, {
             \ 'relative': 'editor',
-            \ 'height': self.height,
-            \ 'width': self.width,
+            \ 'width': width,
+            \ 'height': height,
             \ 'row': row,
             \ 'col': col,
             \ 'anchor': 'NW',
@@ -71,11 +85,13 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         return empty(self.window) || !nvim_win_is_valid(self.window)
     endfunction
 
-    function! tile._set_position(row, col) abort
+    function! tile._set_position(row, col, width, height) abort
         call nvim_win_set_config(self.window, {
             \ 'relative': 'editor',
             \ 'row': a:row,
             \ 'col': a:col,
+            \ 'width': a:width,
+            \ 'height': a:height,
         \ })
     endfunction
 

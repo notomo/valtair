@@ -167,7 +167,7 @@ function! s:suite.max_row()
     let command = valtair#main('-collector=excmd -collector-cmd=ValtairVerticalTest -arranger-max-row=1')
     call command.wait()
 
-    call s:assert.window_count(4)
+    call s:assert.window_count(5)
 endfunction
 
 command! ValtairVerticalWidthTest call s:width_test()
@@ -186,7 +186,7 @@ function! s:suite.large_width()
     let command = valtair#main('-collector=excmd -collector-cmd=ValtairVerticalWidthTest -arranger-width=500')
     call command.wait()
 
-    call s:assert.window_count(1)
+    call s:assert.window_count(2)
 endfunction
 
 command! ValtairVerticalPaddingTest call s:padding_test()

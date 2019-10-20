@@ -235,5 +235,5 @@ function! s:suite.large_row_padding()
     let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalPaddingTest -arranger=horizontal -arranger-row-padding=100')
     call command.wait()
 
-    call s:assert.window_count(1)
+    call s:assert.window_count(3)
 endfunction
