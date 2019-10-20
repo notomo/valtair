@@ -13,26 +13,27 @@ function! valtair#tile#new(event_service, item, bufnr) abort
 
     function! tile.open(offset) abort
         let row = self.y - a:offset.y
-        let lines = &lines - &cmdheight
+        let lines = &lines - &cmdheight - 1
         if lines < row || row + self.height < 0
             return v:true
         endif
 
         let col = self.x - a:offset.x
-        if &columns <= col || col + self.width < 0
+        let columns = &columns - 1
+        if columns < col || col + self.width < 0
             return v:true
         endif
 
         let height = self.height
-        if lines > row && row + self.height > lines
-            let height = lines - row
+        if row <= lines && row + self.height - 1 > lines
+            let height = lines - row + 1
         elseif row < 0
             let height = self.height + row
         endif
 
         let width = self.width
-        if &columns > col && col + self.width > &columns
-            let width = &columns - col
+        if col <= columns && col + self.width - 1 > columns
+            let width = columns - col + 1
         elseif col < 0
             let width = self.width + col
         endif
@@ -91,12 +92,12 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         endif
 
         let col = self.x - a:offset.x
-        if col < 0 || col + self.width > &columns
+        if col < 0 || col + self.width - 1 > &columns - 1
             return v:false
         endif
 
         let row = self.y - a:offset.y
-        if row <= 0 || row + self.height > &lines - &cmdheight
+        if row < 0 || row + self.height - 1 > &lines - &cmdheight - 1
             return v:false
         endif
 

@@ -37,7 +37,7 @@ function! valtair#table#editor(cell_rect, margin) abort
                 \ 'col_index': col_index,
                 \ 'row_index': row_index,
                 \ 'x': (self.rect.width + self._margin) * col_index,
-                \ 'y': (self.rect.height + self._margin) * row_index + 1,
+                \ 'y': (self.rect.height + self._margin) * row_index,
             \ }
             call add(cells[col_index], cell)
 
@@ -73,7 +73,7 @@ function! valtair#table#editor(cell_rect, margin) abort
                 \ 'col_index': col_index,
                 \ 'row_index': row_index,
                 \ 'x': (self.rect.width + self._margin) * col_index,
-                \ 'y': (self.rect.height + self._margin) * row_index + 1,
+                \ 'y': (self.rect.height + self._margin) * row_index,
             \ }
             call add(cells[col_index], cell)
 
