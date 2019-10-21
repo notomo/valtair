@@ -36,6 +36,10 @@ function! valtair#buffer#new(event_service, padding) abort
         call self.event_service.on_buffer_wiped(self.bufnr, a:callback)
     endfunction
 
+    function! buffer.on_tile_entered(callback) abort
+        call self.event_service.on_tile_entered(self.bufnr, a:callback)
+    endfunction
+
     function! buffer.wipe() abort
         execute 'silent!' self.bufnr 'bwipeout!'
     endfunction

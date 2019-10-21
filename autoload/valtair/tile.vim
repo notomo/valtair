@@ -9,6 +9,7 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         \ 'width': a:item.rect.width,
         \ 'height': a:item.rect.height,
         \ 'line_number': a:item.line_number,
+        \ 'index': a:item.index,
     \ }
 
     function! tile.open(offset) abort
@@ -59,7 +60,7 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         call nvim_win_set_var(self.window, '&scrolloff', 999)
 
         call self.event_service.on_moved_window_cursor(self.window, { id -> nvim_win_set_cursor(self.window, [self.line_number, 0]) }, self.bufnr)
-        call self.event_service.on_window_entered(self.window, { id -> self._set_options() }, self.bufnr)
+        call self.event_service.on_window_entered(self.window, { id -> self._on_enter() }, self.bufnr)
     endfunction
 
     function! tile.enter() abort
@@ -67,6 +68,11 @@ function! valtair#tile#new(event_service, item, bufnr) abort
             return
         endif
         call nvim_set_current_win(self.window)
+    endfunction
+
+    function! tile._on_enter() abort
+        call self._set_options()
+        call self.event_service.tile_entered(self.bufnr, self.index)
     endfunction
 
     function! tile._set_options() abort

@@ -26,6 +26,7 @@ function! valtair#arranger#new(event_service, impl) abort
 
         let s:arrangers[self._buffer.bufnr] = self
         call self._buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
+        call self._buffer.on_tile_entered({ index -> self.impl.enter(index) })
 
         call self.enter('first')
     endfunction

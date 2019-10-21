@@ -196,6 +196,20 @@ function! s:suite.max_column()
     call s:assert.window_count(4)
 endfunction
 
+function! s:suite.on_enter()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairHorizontalTest -arranger=horizontal')
+    call command.wait()
+
+    ValtairDo next
+    call s:assert.contains_line('1')
+
+    ValtairDo last
+    wincmd p
+
+    ValtairDo next
+    call s:assert.contains_line('2')
+endfunction
+
 command! ValtairHorizontalWidthTest call s:width_test()
 function! s:width_test() abort
     echomsg '0'
@@ -237,3 +251,4 @@ function! s:suite.large_row_padding()
 
     call s:assert.window_count(3)
 endfunction
+

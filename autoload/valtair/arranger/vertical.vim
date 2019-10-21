@@ -20,6 +20,7 @@ function! valtair#arranger#vertical#new(options) abort
                 let item = {
                     \ 'rect': self._table.rect,
                     \ 'line_number': cell.content,
+                    \ 'index': cell.index,
                     \ 'x': cell.x,
                     \ 'y': cell.y,
                 \ }
@@ -62,6 +63,10 @@ function! valtair#arranger#vertical#new(options) abort
 
     function! arranger.left() abort
         return self._table.wrap_left()
+    endfunction
+
+    function! arranger.enter(index) abort
+        call self._table.enter_vertically(a:index)
     endfunction
 
     return arranger

@@ -6,6 +6,8 @@ function! valtair#table#editor(cell_rect, margin) abort
         \ '_cells': [],
         \ '_row_count': 0,
         \ '_cell_count': 0,
+        \ '_max_row_count': 0,
+        \ '_max_column_count': 0,
         \ '_last_cell': v:null,
         \ '_current': {
             \ 'row': 0,
@@ -22,6 +24,8 @@ function! valtair#table#editor(cell_rect, margin) abort
         if max_row_count == 0
             return []
         endif
+        let self._max_row_count = max_row_count
+
         let column_number = float2nr(ceil(str2float(len(a:contents)) / max_row_count))
         let cells = map(range(column_number), { _k, _v -> [] })
 
@@ -59,6 +63,8 @@ function! valtair#table#editor(cell_rect, margin) abort
         if max_column_count == 0
             return []
         endif
+        let self._max_column_count = max_column_count
+
         let cells = map(range(max_column_count), { _k, _v -> [] })
 
         let index = 0
@@ -193,6 +199,18 @@ function! valtair#table#editor(cell_rect, margin) abort
         call self._set_current(row, column)
 
         return self._cells[column][row].index
+    endfunction
+
+    function! table.enter_vertically(index) abort
+        let row = a:index % self._max_row_count
+        let column = a:index / self._max_row_count
+        call self._set_current(row, column)
+    endfunction
+
+    function! table.enter_horizontally(index) abort
+        let row = a:index / self._max_column_count
+        let column = a:index % self._max_column_count
+        call self._set_current(row, column)
     endfunction
 
     function! table._get_current() abort

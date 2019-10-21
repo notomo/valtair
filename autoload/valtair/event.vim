@@ -3,6 +3,7 @@ let s:JOB_FINISHED = 'ValtairJobFinished'
 let s:COLLECTOR_FINISHED = 'ValtairCollectorFinished'
 let s:WINDOW_CURSOR_MOVED = 'ValtairWindowCursorMoved'
 let s:WINDOW_ENTERED = 'ValtairWindowEntered'
+let s:TILE_ENTERED = 'ValtairTileEntered'
 
 let s:callbacks = {}
 let s:buffer_callbacks = {}
@@ -30,12 +31,24 @@ function! valtair#event#service() abort
         execute printf('autocmd %s <buffer=%s> call s:buffer_callback("%s", %s)', a:event_name, a:bufnr, buffer_event_name, a:bufnr)
     endfunction
 
+    function! service._on_buffer_user_event(event_name, bufnr, callback) abort
+        let buffer_event_name = self._buffer_event_name(a:event_name, a:bufnr)
+        let s:buffer_callbacks[buffer_event_name] = a:callback
+        execute printf('autocmd User %s:* ++nested call s:buffer_user_callback(expand("<amatch>"), "%s", %s)', buffer_event_name, buffer_event_name, a:bufnr)
+
+        execute printf('autocmd BufWipeout <buffer=%s> call s:clean_buffer_user_event("%s")', a:bufnr, buffer_event_name)
+    endfunction
+
     function! service.on_moved_window_cursor(id, callback, bufnr) abort
         call self._buffer_group_event(s:WINDOW_CURSOR_MOVED, a:id, a:callback, a:bufnr)
     endfunction
 
     function! service.on_window_entered(id, callback, bufnr) abort
         call self._buffer_group_event(s:WINDOW_ENTERED, a:id, a:callback, a:bufnr)
+    endfunction
+
+    function! service.on_tile_entered(bufnr, callback) abort
+        call self._on_buffer_user_event(s:TILE_ENTERED, a:bufnr, a:callback)
     endfunction
 
     function! service._buffer_group_event(event_name, id, callback, bufnr) abort
@@ -97,6 +110,11 @@ function! valtair#event#service() abort
         call self._emit(event_name, id)
     endfunction
 
+    function! service.tile_entered(bufnr, index) abort
+        let event_name = self._buffer_event_name(s:TILE_ENTERED, a:bufnr)
+        call self._emit(event_name, a:index)
+    endfunction
+
     function! service._emit(event_name, id) abort
         let event = printf('%s:%s', a:event_name, a:id)
         call self.logger.log(event)
@@ -120,7 +138,17 @@ function! s:buffer_callback(buffer_event_name, bufnr) abort
     call remove(s:buffer_callbacks, a:buffer_event_name)
 endfunction
 
+function! s:buffer_user_callback(amatch, buffer_event_name, bufnr) abort
+    let [_, id] = split(a:amatch, a:buffer_event_name . ':', 'keep')
+    call s:buffer_callbacks[a:buffer_event_name](id)
+endfunction
+
 function! s:clean_group(group_name) abort
     execute 'autocmd!' . a:group_name
     call remove(s:callbacks, a:group_name)
+endfunction
+
+function! s:clean_buffer_user_event(event_name) abort
+    execute 'autocmd! User' a:event_name . ':*'
+    call remove(s:buffer_callbacks, a:event_name)
 endfunction

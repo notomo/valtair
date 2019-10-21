@@ -170,6 +170,20 @@ function! s:suite.max_row()
     call s:assert.window_count(5)
 endfunction
 
+function! s:suite.on_enter()
+    let command = valtair#main('-collector=excmd -collector-cmd=ValtairVerticalTest')
+    call command.wait()
+
+    ValtairDo next
+    call s:assert.contains_line('1')
+
+    ValtairDo last
+    wincmd p
+
+    ValtairDo next
+    call s:assert.contains_line('2')
+endfunction
+
 command! ValtairVerticalWidthTest call s:width_test()
 function! s:width_test() abort
     echomsg '0'

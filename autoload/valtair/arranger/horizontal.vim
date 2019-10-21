@@ -19,7 +19,7 @@ function! valtair#arranger#horizontal#new(options) abort
             for cell in rows
                 let item = {
                     \ 'rect': self._table.rect,
-                    \ '_index': cell.index,
+                    \ 'index': cell.index,
                     \ 'line_number': cell.content,
                     \ 'x': cell.x,
                     \ 'y': cell.y,
@@ -29,7 +29,7 @@ function! valtair#arranger#horizontal#new(options) abort
             endfor
         endfor
 
-        call sort(items, { a, b -> a._index > b._index })
+        call sort(items, { a, b -> a.index > b.index })
         call self.logger.label('item').logs(items)
 
         return items
@@ -65,6 +65,10 @@ function! valtair#arranger#horizontal#new(options) abort
 
     function! arranger.left() abort
         return self._table.wrap_left()
+    endfunction
+
+    function! arranger.enter(index) abort
+        call self._table.enter_horizontally(a:index)
     endfunction
 
     return arranger
