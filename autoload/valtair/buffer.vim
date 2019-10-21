@@ -6,8 +6,6 @@ function! valtair#buffer#new(event_service, padding) abort
         \ 'event_service': a:event_service,
         \ '_padding': a:padding,
     \ }
-    call nvim_buf_set_option(buffer.bufnr, 'bufhidden', 'wipe')
-    call nvim_buf_set_option(buffer.bufnr, 'filetype', 'valtair')
 
     function! buffer.get_line_numbers(texts) abort
         let line_numbers = []
@@ -40,9 +38,19 @@ function! valtair#buffer#new(event_service, padding) abort
         call self.event_service.on_tile_entered(self.bufnr, a:callback)
     endfunction
 
+    function! buffer.wipe_on_hidden(enabled) abort
+        if a:enabled
+            return nvim_buf_set_option(self.bufnr, 'bufhidden', 'wipe')
+        endif
+        return nvim_buf_set_option(self.bufnr, 'bufhidden', '')
+    endfunction
+
     function! buffer.wipe() abort
         execute 'silent!' self.bufnr 'bwipeout!'
     endfunction
+
+    call buffer.wipe_on_hidden(v:true)
+    call nvim_buf_set_option(buffer.bufnr, 'filetype', 'valtair')
 
     return buffer
 endfunction

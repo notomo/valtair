@@ -1,7 +1,8 @@
 
-function! valtair#tiles#new(event_service) abort
+function! valtair#tiles#new(event_service, buffer) abort
     let tiles = {
         \ '_event_service': a:event_service,
+        \ '_buffer': a:buffer,
         \ '_tiles': [],
         \ '_offset': {
             \ 'x': 0,
@@ -16,16 +17,11 @@ function! valtair#tiles#new(event_service) abort
             let self._offset.y = max([next_tile.y + next_tile.height - (&lines - &cmdheight) + 1, 0])
         endif
 
-        let close_tiles = []
+        call self._buffer.wipe_on_hidden(v:false)
         for tile in self._tiles
-            if tile.open(self._offset)
-                call add(close_tiles, tile)
-            endif
+            call tile.open(self._offset)
         endfor
-
-        for tile in close_tiles
-            call tile.close()
-        endfor
+        call self._buffer.wipe_on_hidden(v:true)
 
         call next_tile.enter()
     endfunction

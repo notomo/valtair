@@ -16,13 +16,13 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         let row = self.y - a:offset.y
         let lines = &lines - &cmdheight - 1
         if lines < row || row + self.height < 0
-            return v:true
+            return self.close()
         endif
 
         let col = self.x - a:offset.x
         let columns = &columns - 1
         if columns < col || col + self.width < 0
-            return v:true
+            return self.close()
         endif
 
         let height = self.height

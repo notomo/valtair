@@ -7,10 +7,11 @@ function! valtair#arranger#new(event_service, impl) abort
         call arranger.close()
     endif
 
+    let buffer = valtair#buffer#new(a:event_service, a:impl.padding)
     let arranger = {
         \ 'impl': a:impl,
-        \ '_tiles': valtair#tiles#new(a:event_service),
-        \ '_buffer': valtair#buffer#new(a:event_service, a:impl.padding),
+        \ '_tiles': valtair#tiles#new(a:event_service, buffer),
+        \ '_buffer': buffer,
         \ 'logger': valtair#logger#new('arranger'),
     \ }
 
