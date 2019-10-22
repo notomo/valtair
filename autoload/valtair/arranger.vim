@@ -15,9 +15,9 @@ function! valtair#arranger#new(event_service, impl) abort
         \ 'logger': valtair#logger#new('arranger'),
     \ }
 
-    function! arranger.open_tiles(texts) abort
-        let line_numbers = self._buffer.get_line_numbers(a:texts)
-        let items = self.impl.items(line_numbers)
+    function! arranger.open_tiles(targets) abort
+        let targets = self._buffer.add_line_numbers(a:targets)
+        let items = self.impl.items(targets)
         if empty(items)
             return
         endif
@@ -44,6 +44,17 @@ function! valtair#arranger#new(event_service, impl) abort
     function! arranger.close() abort
         call self._buffer.wipe()
         call self._tiles.clear()
+    endfunction
+
+    function! arranger.action(name) abort
+        let index = self.impl.current()
+        let [Action, err] = self._tiles.action(index, a:name)
+        if !empty(err)
+            return valtair#messenger#new().error(err)
+        endif
+
+        call self.close()
+        call Action()
     endfunction
 
     return arranger

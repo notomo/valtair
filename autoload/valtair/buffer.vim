@@ -7,14 +7,16 @@ function! valtair#buffer#new(event_service, padding) abort
         \ '_padding': a:padding,
     \ }
 
-    function! buffer.get_line_numbers(texts) abort
-        let line_numbers = []
+    function! buffer.add_line_numbers(texts) abort
+        let texts = []
+
         let lines = []
         for text in a:texts
             call extend(lines, self._padding.lines)
 
-            call add(lines, self._padding.add_left(text))
-            call add(line_numbers, len(lines))
+            call add(lines, self._padding.add_left(text.value))
+            let text.line_number = len(lines)
+            call add(texts, text)
 
             call extend(lines, self._padding.lines)
         endfor
@@ -22,7 +24,7 @@ function! valtair#buffer#new(event_service, padding) abort
         call nvim_buf_set_lines(self.bufnr, 0, -1, v:true, lines)
         call nvim_buf_set_option(self.bufnr, 'modifiable', v:false)
 
-        return line_numbers
+        return texts
     endfunction
 
     function! buffer.fix_cursor() abort

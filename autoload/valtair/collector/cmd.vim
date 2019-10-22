@@ -10,8 +10,8 @@ function! valtair#collector#cmd#new(event_service, options) abort
         \ 'job': valtair#job#new(cmd, a:event_service),
     \ }
 
-    function! collector.texts() abort
-        return self.job.stdout
+    function! collector.targets() abort
+        return map(self.job.stdout, { _, v -> {'type': 'file', 'value': v}})
     endfunction
 
     return collector

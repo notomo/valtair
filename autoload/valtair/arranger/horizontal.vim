@@ -13,14 +13,14 @@ function! valtair#arranger#horizontal#new(options) abort
         \ '_max_column': a:options.max_column,
     \ }
 
-    function! arranger.items(line_numbers) abort
+    function! arranger.items(targets) abort
         let items = []
-        for rows in self._table.make_cells_horizontally(a:line_numbers, self._max_column)
+        for rows in self._table.make_cells_horizontally(a:targets, self._max_column)
             for cell in rows
                 let item = {
                     \ 'rect': self._table.rect,
                     \ 'index': cell.index,
-                    \ 'line_number': cell.content,
+                    \ 'target': cell.content,
                     \ 'x': cell.x,
                     \ 'y': cell.y,
                 \ }
@@ -69,6 +69,10 @@ function! valtair#arranger#horizontal#new(options) abort
 
     function! arranger.enter(index) abort
         call self._table.enter_horizontally(a:index)
+    endfunction
+
+    function! arranger.current() abort
+        return self._table.current()
     endfunction
 
     return arranger

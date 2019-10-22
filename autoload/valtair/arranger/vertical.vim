@@ -13,13 +13,13 @@ function! valtair#arranger#vertical#new(options) abort
         \ '_max_row': a:options.max_row,
     \ }
 
-    function! arranger.items(line_numbers) abort
+    function! arranger.items(targets) abort
         let items = []
-        for rows in self._table.make_cells_vertically(a:line_numbers, self._max_row)
+        for rows in self._table.make_cells_vertically(a:targets, self._max_row)
             for cell in rows
                 let item = {
                     \ 'rect': self._table.rect,
-                    \ 'line_number': cell.content,
+                    \ 'target': cell.content,
                     \ 'index': cell.index,
                     \ 'x': cell.x,
                     \ 'y': cell.y,
@@ -67,6 +67,10 @@ function! valtair#arranger#vertical#new(options) abort
 
     function! arranger.enter(index) abort
         call self._table.enter_vertically(a:index)
+    endfunction
+
+    function! arranger.current() abort
+        return self._table.current()
     endfunction
 
     return arranger

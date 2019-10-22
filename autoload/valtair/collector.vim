@@ -8,12 +8,12 @@ function! valtair#collector#new(event_service, impl) abort
         \ 'id': s:id,
         \ 'event_service': a:event_service,
         \ 'impl': a:impl,
-        \ 'texts': [],
+        \ 'targets': [],
     \ }
 
     function! collector.start() abort
         if !has_key(self.impl, 'job')
-            let self.texts = self.impl.texts()
+            let self.targets = self.impl.targets()
             call self.event_service.collector_finished(self.id)
             return
         endif
@@ -24,7 +24,7 @@ function! valtair#collector#new(event_service, impl) abort
     endfunction
 
     function! collector.on_job_finished(id) abort
-        let self.texts = self.impl.texts()
+        let self.targets = self.impl.targets()
         call self.event_service.collector_finished(self.id)
     endfunction
 

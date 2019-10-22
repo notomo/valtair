@@ -155,3 +155,19 @@ function! s:suite.execute_multiple()
     ValtairDo down
     call s:assert.contains_line('foo')
 endfunction
+
+function! s:suite.open()
+    cd test/plugin/_test_data/open
+    call s:sync_main('-collector-cmd=ls\ -1')
+
+    call s:assert.window_count(3)
+
+    ValtairDo down
+    call s:assert.contains_line('opened')
+
+    ValtairDo open
+
+    call s:assert.file_name('opened')
+    call s:assert.window_count(1)
+    call s:assert.contains_line('opened_file')
+endfunction

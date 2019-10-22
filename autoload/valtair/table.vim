@@ -213,6 +213,11 @@ function! valtair#table#editor(cell_rect, margin) abort
         call self._set_current(row, column)
     endfunction
 
+    function! table.current() abort
+        let current = self._get_current()
+        return self._cells[current.column][current.row].index
+    endfunction
+
     function! table._get_current() abort
         call self.logger.label('get current').log(self._current)
         return self._current

@@ -30,6 +30,7 @@ let s:actions = {
     \ 'left': { arranger -> arranger.enter('left') },
     \ 'right': { arranger -> arranger.enter('right') },
     \ 'quit': { arranger -> arranger.close() },
+    \ 'open': { arranger -> arranger.action('open') },
 \ }
 
 function! valtair#do(args) abort

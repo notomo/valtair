@@ -4,39 +4,40 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         \ 'bufnr': a:bufnr,
         \ 'window': v:null,
         \ 'event_service': a:event_service,
-        \ 'x': a:item.x,
-        \ 'y': a:item.y,
-        \ 'width': a:item.rect.width,
-        \ 'height': a:item.rect.height,
-        \ 'line_number': a:item.line_number,
-        \ 'index': a:item.index,
+        \ 'target': a:item.target,
+        \ '_x': a:item.x,
+        \ '_y': a:item.y,
+        \ '_width': a:item.rect.width,
+        \ '_height': a:item.rect.height,
+        \ '_line_number': a:item.target.line_number,
+        \ '_index': a:item.index,
     \ }
 
     function! tile.open(offset) abort
-        let row = self.y - a:offset.y
+        let row = self._y - a:offset.y
         let lines = &lines - &cmdheight - 1
-        if lines < row || row + self.height < 0
+        if lines < row || row + self._height < 0
             return self.close()
         endif
 
-        let col = self.x - a:offset.x
+        let col = self._x - a:offset.x
         let columns = &columns - 1
-        if columns < col || col + self.width < 0
+        if columns < col || col + self._width < 0
             return self.close()
         endif
 
-        let height = self.height
-        if row <= lines && row + self.height - 1 > lines
+        let height = self._height
+        if row <= lines && row + self._height - 1 > lines
             let height = lines - row + 1
         elseif row < 0
-            let height = self.height + row
+            let height = self._height + row
         endif
 
-        let width = self.width
-        if col <= columns && col + self.width - 1 > columns
+        let width = self._width
+        if col <= columns && col + self._width - 1 > columns
             let width = columns - col + 1
         elseif col < 0
-            let width = self.width + col
+            let width = self._width + col
         endif
 
         if !self.closed()
@@ -56,10 +57,10 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         \ })
         call nvim_win_set_option(self.window, 'winhighlight', 'Normal:ValtairTailActive,NormalNC:ValtairTailInactive')
         call nvim_win_set_option(self.window, 'winblend', 15)
-        call nvim_win_set_cursor(self.window, [self.line_number, 0])
+        call nvim_win_set_cursor(self.window, [self._line_number, 0])
         call nvim_win_set_var(self.window, '&scrolloff', 999)
 
-        call self.event_service.on_moved_window_cursor(self.window, { id -> nvim_win_set_cursor(self.window, [self.line_number, 0]) }, self.bufnr)
+        call self.event_service.on_moved_window_cursor(self.window, { id -> nvim_win_set_cursor(self.window, [self._line_number, 0]) }, self.bufnr)
         call self.event_service.on_window_entered(self.window, { id -> self._on_enter() }, self.bufnr)
     endfunction
 
@@ -72,7 +73,7 @@ function! valtair#tile#new(event_service, item, bufnr) abort
 
     function! tile._on_enter() abort
         call self._set_options()
-        call self.event_service.tile_entered(self.bufnr, self.index)
+        call self.event_service.tile_entered(self.bufnr, self._index)
     endfunction
 
     function! tile._set_options() abort
@@ -97,13 +98,13 @@ function! valtair#tile#new(event_service, item, bufnr) abort
             return v:false
         endif
 
-        let col = self.x - a:offset.x
-        if col < 0 || col + self.width - 1 > &columns - 1
+        let col = self._x - a:offset.x
+        if col < 0 || col + self._width - 1 > &columns - 1
             return v:false
         endif
 
-        let row = self.y - a:offset.y
-        if row < 0 || row + self.height - 1 > &lines - &cmdheight - 1
+        let row = self._y - a:offset.y
+        if row < 0 || row + self._height - 1 > &lines - &cmdheight - 1
             return v:false
         endif
 
@@ -118,6 +119,12 @@ function! valtair#tile#new(event_service, item, bufnr) abort
             \ 'width': a:width,
             \ 'height': a:height,
         \ })
+    endfunction
+
+    function! tile.offset() abort
+        let x = max([self._x + self._width - &columns + 1, 0])
+        let y = max([self._y + self._height - (&lines - &cmdheight) + 1, 0])
+        return {'x': x, 'y': y}
     endfunction
 
     return tile
