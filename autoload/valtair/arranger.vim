@@ -19,7 +19,7 @@ function! valtair#arranger#new(event_service, impl) abort
         let targets = self._buffer.add_line_numbers(a:targets)
         let items = self.impl.items(targets)
         if empty(items)
-            return
+            return v:null
         endif
         call self._tiles.open(items)
 
@@ -29,16 +29,17 @@ function! valtair#arranger#new(event_service, impl) abort
         call self._buffer.on_wiped({ bufnr -> remove(s:arrangers, bufnr) })
         call self._buffer.on_tile_entered({ index -> self.impl.enter(index) })
 
-        call self.enter('first')
+        return self.enter('first')
     endfunction
 
     function! arranger.enter(name) abort
         if !has_key(self.impl, a:name)
-            return valtair#messenger#new().warn('not implemented action: ' . a:name)
+            return 'not implemented action: ' . a:name
         endif
 
         let index = self.impl[a:name]()
         call self._tiles.enter(index)
+        return v:null
     endfunction
 
     function! arranger.close() abort

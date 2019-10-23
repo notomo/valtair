@@ -20,8 +20,7 @@ function! valtair#commander#new(arranger) abort
     function! commander.call(name) abort
         if has_key(s:actions, a:name)
             call self.logger.log('arranger action: ' . a:name)
-            call s:actions[a:name](self._arranger)
-            return v:null
+            return s:actions[a:name](self._arranger)
         endif
 
         let target = self._arranger.current_target()
@@ -30,8 +29,7 @@ function! valtair#commander#new(arranger) abort
             call self._arranger.close()
 
             call self.logger.log('action: ' . a:name)
-            call impl[a:name](target)
-            return v:null
+            return impl[a:name](target)
         endif
 
         return 'not found action: ' . a:name
