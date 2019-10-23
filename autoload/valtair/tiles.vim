@@ -40,13 +40,9 @@ function! valtair#tiles#new(event_service, buffer) abort
         let self._offset.y = 0
     endfunction
 
-    function! tiles.action(index, name) abort
+    function! tiles.target(index) abort
         let tile = self._tiles[a:index]
-        call self.logger.label('index').log(a:index)
-        call self.logger.label('target').log(tile.target)
-
-        let commander = valtair#commander#new(tile.target.type)
-        return commander.get(a:name, tile.target.value)
+        return tile.target
     endfunction
 
     return tiles

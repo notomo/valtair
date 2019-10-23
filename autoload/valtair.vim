@@ -2,7 +2,7 @@
 function! valtair#main(args) abort
     let [options, err] = valtair#option#parse(a:args)
     if !empty(err)
-        return valtair#messenger#new().error(err)
+        return valtair#messenger#new().error('failed to parse option: ' . err)
     endif
 
     let event_service = valtair#event#service()
@@ -20,19 +20,6 @@ function! valtair#main(args) abort
     return command
 endfunction
 
-let s:actions = {
-    \ 'first': { arranger -> arranger.enter('first') },
-    \ 'last': { arranger -> arranger.enter('last') },
-    \ 'next': { arranger -> arranger.enter('next') },
-    \ 'prev': { arranger -> arranger.enter('prev') },
-    \ 'up': { arranger -> arranger.enter('up') },
-    \ 'down': { arranger -> arranger.enter('down') },
-    \ 'left': { arranger -> arranger.enter('left') },
-    \ 'right': { arranger -> arranger.enter('right') },
-    \ 'quit': { arranger -> arranger.close() },
-    \ 'open': { arranger -> arranger.action('open') },
-\ }
-
 function! valtair#do(args) abort
     call valtair#logger#new('valtair#do').log(a:args)
 
@@ -41,9 +28,9 @@ function! valtair#do(args) abort
         return valtair#messenger#new().warn('not started')
     endif
 
-    if has_key(s:actions, a:args)
-        return s:actions[a:args](arranger)
+    let commander = valtair#commander#new(arranger)
+    let err = commander.call(a:args)
+    if !empty(err)
+        return valtair#messenger#new().error('failed to call commander: ' . err)
     endif
-
-    return valtair#messenger#new().error('not found action: ' . a:args)
 endfunction

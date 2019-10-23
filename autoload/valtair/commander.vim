@@ -1,20 +1,36 @@
 
-function! valtair#commander#new(type) abort
-    let impl = valtair#loader#new().load('valtair/commander', a:type, [])
+let s:actions = {
+    \ 'first': { arranger -> arranger.enter('first') },
+    \ 'last': { arranger -> arranger.enter('last') },
+    \ 'next': { arranger -> arranger.enter('next') },
+    \ 'prev': { arranger -> arranger.enter('prev') },
+    \ 'up': { arranger -> arranger.enter('up') },
+    \ 'down': { arranger -> arranger.enter('down') },
+    \ 'left': { arranger -> arranger.enter('left') },
+    \ 'right': { arranger -> arranger.enter('right') },
+    \ 'quit': { arranger -> arranger.close() },
+\ }
 
+function! valtair#commander#new(arranger) abort
     let commander = {
-        \ '_impl': impl,
+        \ '_arranger': a:arranger,
     \ }
 
-    function! commander.get(name, value) abort
-        if !has_key(self._impl, a:name)
-            let err = 'not found action name: ' . a:name
-            return [v:null, err]
+    function! commander.call(name) abort
+        if has_key(s:actions, a:name)
+            call s:actions[a:name](self._arranger)
+            return v:null
         endif
 
-        let name = a:name
-        let value = a:value
-        return [{ -> self._impl[name](value) }, v:null]
+        let target = self._arranger.current_target()
+        let impl = valtair#loader#new().load('valtair/commander', target.type, [])
+        if has_key(impl, a:name)
+            call self._arranger.close()
+            call impl[a:name](target)
+            return v:null
+        endif
+
+        return 'not found action: ' . a:name
     endfunction
 
     return commander

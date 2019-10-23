@@ -46,15 +46,9 @@ function! valtair#arranger#new(event_service, impl) abort
         call self._tiles.clear()
     endfunction
 
-    function! arranger.action(name) abort
+    function! arranger.current_target() abort
         let index = self.impl.current()
-        let [Action, err] = self._tiles.action(index, a:name)
-        if !empty(err)
-            return valtair#messenger#new().error(err)
-        endif
-
-        call self.close()
-        call Action()
+        return self._tiles.target(index)
     endfunction
 
     return arranger

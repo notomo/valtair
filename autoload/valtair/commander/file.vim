@@ -3,8 +3,8 @@ function! valtair#commander#file#new() abort
     let file = {
     \ }
 
-    function! file.open(value) abort
-        execute 'edit' a:value
+    function! file.open(target) abort
+        execute 'edit' a:target.value
     endfunction
 
     return file
