@@ -14,10 +14,12 @@ let s:actions = {
 function! valtair#commander#new(arranger) abort
     let commander = {
         \ '_arranger': a:arranger,
+        \ 'logger': valtair#logger#new('commander'),
     \ }
 
     function! commander.call(name) abort
         if has_key(s:actions, a:name)
+            call self.logger.log('arranger action: ' . a:name)
             call s:actions[a:name](self._arranger)
             return v:null
         endif
@@ -26,6 +28,8 @@ function! valtair#commander#new(arranger) abort
         let impl = valtair#loader#new().load('valtair/commander', target.type, [])
         if has_key(impl, a:name)
             call self._arranger.close()
+
+            call self.logger.log('action: ' . a:name)
             call impl[a:name](target)
             return v:null
         endif
