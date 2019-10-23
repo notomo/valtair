@@ -1,15 +1,14 @@
 
 function! valtair#tile#new(event_service, item, bufnr) abort
     let tile = {
-        \ 'bufnr': a:bufnr,
-        \ 'window': v:null,
-        \ 'event_service': a:event_service,
         \ 'target': a:item.target,
+        \ '_event_service': a:event_service,
+        \ '_bufnr': a:bufnr,
+        \ '_window': valtair#window#new(a:event_service, a:bufnr, a:item.target.line_number),
         \ '_x': a:item.x,
         \ '_y': a:item.y,
         \ '_width': a:item.rect.width,
         \ '_height': a:item.rect.height,
-        \ '_line_number': a:item.target.line_number,
         \ '_index': a:item.index,
     \ }
 
@@ -17,13 +16,13 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         let row = self._y - a:offset.y
         let lines = &lines - &cmdheight - 1
         if lines < row || row + self._height < 0
-            return self.close()
+            return self._window.close()
         endif
 
         let col = self._x - a:offset.x
         let columns = &columns - 1
         if columns < col || col + self._width < 0
-            return self.close()
+            return self._window.close()
         endif
 
         let height = self._height
@@ -40,61 +39,20 @@ function! valtair#tile#new(event_service, item, bufnr) abort
             let width = self._width + col
         endif
 
-        if !self.closed()
-            return self._set_position(row, col, width, height)
-        endif
-
-        let self.window = nvim_open_win(self.bufnr, v:false, {
-            \ 'relative': 'editor',
-            \ 'width': width,
-            \ 'height': height,
-            \ 'row': row,
-            \ 'col': col,
-            \ 'anchor': 'NW',
-            \ 'focusable': v:true,
-            \ 'external': v:false,
-            \ 'style': 'minimal',
-        \ })
-        call nvim_win_set_option(self.window, 'winhighlight', 'Normal:ValtairTailActive,NormalNC:ValtairTailInactive')
-        call nvim_win_set_option(self.window, 'winblend', 15)
-        call nvim_win_set_cursor(self.window, [self._line_number, 0])
-        call nvim_win_set_var(self.window, '&scrolloff', 999)
-
-        call self.event_service.on_moved_window_cursor(self.window, { id -> nvim_win_set_cursor(self.window, [self._line_number, 0]) }, self.bufnr)
-        call self.event_service.on_window_entered(self.window, { id -> self._on_enter() }, self.bufnr)
+        return self._window.open(row, col, width, height, { id -> self._on_enter() })
     endfunction
 
     function! tile.enter() abort
-        if self.closed()
-            return
-        endif
-        call nvim_set_current_win(self.window)
+        call self._window.enter()
     endfunction
 
     function! tile._on_enter() abort
-        call self._set_options()
-        call self.event_service.tile_entered(self.bufnr, self._index)
-    endfunction
-
-    function! tile._set_options() abort
-        " FIXME: could not disable CursorLine, CursorColumn highlight
-        call nvim_win_set_option(self.window, 'cursorline', v:false)
-        call nvim_win_set_option(self.window, 'cursorcolumn', v:false)
-    endfunction
-
-    function! tile.close() abort
-        if self.closed()
-            return
-        endif
-        call nvim_win_close(self.window, v:false)
-    endfunction
-
-    function! tile.closed() abort
-        return empty(self.window) || !nvim_win_is_valid(self.window)
+        call self._window.reset_option()
+        call self._event_service.tile_entered(self._bufnr, self._index)
     endfunction
 
     function! tile.displayed_all(offset) abort
-        if self.closed()
+        if self._window.closed()
             return v:false
         endif
 
@@ -109,16 +67,6 @@ function! valtair#tile#new(event_service, item, bufnr) abort
         endif
 
         return v:true
-    endfunction
-
-    function! tile._set_position(row, col, width, height) abort
-        call nvim_win_set_config(self.window, {
-            \ 'relative': 'editor',
-            \ 'row': a:row,
-            \ 'col': a:col,
-            \ 'width': a:width,
-            \ 'height': a:height,
-        \ })
     endfunction
 
     function! tile.offset() abort
