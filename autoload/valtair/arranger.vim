@@ -21,7 +21,7 @@ function! valtair#arranger#new(event_service, impl) abort
         if empty(items)
             return
         endif
-        call self._tiles.open(items, self._buffer.bufnr)
+        call self._tiles.open(items)
 
         call self._buffer.fix_cursor()
 

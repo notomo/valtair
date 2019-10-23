@@ -26,9 +26,8 @@ function! valtair#tiles#new(event_service, buffer) abort
         call next_tile.enter()
     endfunction
 
-    function! tiles.open(items, bufnr) abort
-        let bufnr = a:bufnr
-        let self._tiles = map(a:items, { _, item -> valtair#tile#new(self._event_service, item, bufnr) })
+    function! tiles.open(items) abort
+        let self._tiles = map(a:items, { _, item -> valtair#tile#new(self._event_service, item, self._buffer.bufnr) })
         for tile in self._tiles
             call tile.open(self._offset)
         endfor
