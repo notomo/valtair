@@ -36,14 +36,14 @@ endfunction
 function! s:suite.invalid_row_padding()
     let [options, err] = valtair#option#parse('-arranger-row-padding=-1')
 
-    call themis#log('[test messanger] ' . err)
+    call themis#log('[test messenger] ' . err)
     call s:assert.not_empty(err)
 endfunction
 
 function! s:suite.invalid_width()
     let [options, err] = valtair#option#parse('-arranger-width=0')
 
-    call themis#log('[test messanger] ' . err)
+    call themis#log('[test messenger] ' . err)
     call s:assert.not_empty(err)
 endfunction
 
@@ -57,7 +57,7 @@ endfunction
 function! s:suite.invalid_max_row()
     let [options, err] = valtair#option#parse('-arranger-max-row=0')
 
-    call themis#log('[test messanger] ' . err)
+    call themis#log('[test messenger] ' . err)
     call s:assert.not_empty(err)
 endfunction
 
@@ -71,6 +71,6 @@ endfunction
 function! s:suite.invalid_max_column()
     let [options, err] = valtair#option#parse('-arranger-max-column=0')
 
-    call themis#log('[test messanger] ' . err)
+    call themis#log('[test messenger] ' . err)
     call s:assert.not_empty(err)
 endfunction

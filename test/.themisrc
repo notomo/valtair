@@ -14,7 +14,7 @@ function! ValtairTestBeforeEach(assert) abort
     let &cmdheight = s:cmdheight
     let &showtabline = s:showtabline
 
-    call valtair#messenger#set_func({ msg -> themis#log('[test messanger] ' . msg) })
+    call valtair#messenger#set_func({ msg -> themis#log('[test messenger] ' . msg) })
     call valtair#logger#set_func({ msg -> themis#log(msg) })
     call themis#log('')
 
