@@ -15,6 +15,18 @@ let s:options = {
     \ }
 \ }
 
+function! valtair#option#all() abort
+    let keys = keys(s:options)
+    let options_names = map(copy(keys), { _, name -> printf('--%s=', name) })
+
+    for key in keys
+        let names = map(keys(s:options[key]['options']), { _, name -> printf('--%s-%s=', key, substitute(name, '_', '-', 'g')) })
+        call extend(options_names, names)
+    endfor
+
+    return options_names
+endfunction
+
 function! valtair#option#parse(raw_args) abort
     let options = deepcopy(s:options)
     for arg in split(a:raw_args, '\v(\\\zs\\\s+|[^\\]\zs\s+)')

@@ -11,3 +11,12 @@ function! valtair#complete#do(current_arg, line, _cursor_position) abort
     call logger.log(candidates)
     return join(candidates, "\n")
 endfunction
+
+function! valtair#complete#main(current_arg, line, _cursor_position) abort
+    let logger = valtair#logger#new('complete.main')
+
+    let candidates = valtair#option#all()
+
+    call logger.log(candidates)
+    return join(candidates, "\n")
+endfunction

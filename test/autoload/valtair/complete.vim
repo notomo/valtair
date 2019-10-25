@@ -29,3 +29,13 @@ function! s:suite.do()
     call s:assert.contains(names, 'quit')
     call s:assert.contains(names, 'open')
 endfunction
+
+function! s:suite.main()
+    let got = valtair#complete#main('', 'Valtair ', s:_cursor_position)
+    let names = split(got, "\n")
+
+    call s:assert.contains(names, '--collector=')
+    call s:assert.contains(names, '--arranger=')
+    call s:assert.contains(names, '--arranger-width=')
+    call s:assert.contains(names, '--arranger-max-row=')
+endfunction
