@@ -12,5 +12,15 @@ function! valtair#loader#new() abort
         return call(autoload_path, a:args)
     endfunction
 
+    function! loader.names(path) abort
+        let pattern = printf('autoload/valtair/%s/*.vim', a:path)
+        call self.logger.log('load pattern: ' . pattern)
+
+        let paths = globpath(&runtimepath, pattern, v:true, v:true)
+        call map(paths, { _, path -> fnamemodify(path, ':t:r')})
+        call self.logger.log(paths)
+        return paths
+    endfunction
+
     return loader
 endfunction
