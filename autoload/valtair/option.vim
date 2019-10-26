@@ -15,34 +15,37 @@ let s:options = {
     \ }
 \ }
 
-function! valtair#option#all() abort
-    let keys = keys(s:options)
-    let options_names = map(copy(keys), { _, name -> printf('-%s=', name) })
-
-    for key in keys
-        let names = map(keys(s:options[key]['options']), { _, name -> printf('-%s-%s=', key, substitute(name, '_', '-', 'g')) })
-        call extend(options_names, names)
+let s:empty_options = deepcopy(s:options)
+for key in keys(s:options)
+    let s:empty_options[key].name = v:null
+    for option_name in keys(s:empty_options[key].options)
+        let s:empty_options[key]['options'][option_name] = v:null
     endfor
+endfor
 
-    return options_names
+function! valtair#option#names() abort
+    return keys(s:flatten(deepcopy(s:empty_options)))
+endfunction
+
+function! valtair#option#parse_flatten(raw_args) abort
+    let [options, err] = s:parse(a:raw_args, s:empty_options)
+    if !empty(err)
+        return [v:null, err]
+    endif
+
+    let flatten = s:flatten(options)
+    let empty_options = s:flatten(deepcopy(s:empty_options))
+    call filter(flatten, { k, v -> !has_key(empty_options, k) || empty_options[k] != v })
+
+    call valtair#logger#new('option').label('flatten').log(flatten)
+    return [flatten, v:null]
 endfunction
 
 function! valtair#option#parse(raw_args) abort
-    let options = deepcopy(s:options)
-    for arg in split(a:raw_args, '\v(\\\zs\\\s+|[^\\]\zs\s+)')
-        let [key, value] = valtair#option#parse_one(arg)
-        if empty(key)
-            continue
-        endif
-
-        let splitted = split(key, '-')
-        if len(splitted) >= 2
-            let sub_key = join(splitted[1:], '_')
-            let options[splitted[0]]['options'][sub_key] = value
-        else
-            let options[splitted[0]]['name'] = value
-        endif
-    endfor
+    let [options, err] = s:parse(a:raw_args, s:options)
+    if !empty(err)
+        return [v:null, err]
+    endif
 
     let [options.arranger.options.width, err] = s:positive_number(options.arranger.options.width)
     if !empty(err)
@@ -69,6 +72,25 @@ function! valtair#option#parse(raw_args) abort
     endif
 
     call valtair#logger#new('option').log(options)
+    return [options, v:null]
+endfunction
+
+function! s:parse(raw_args, options) abort
+    let options = deepcopy(a:options)
+    for arg in split(a:raw_args, '\v(\\\zs\\\s+|[^\\]\zs\s+)')
+        let [key, value] = valtair#option#parse_one(arg)
+        if empty(key)
+            continue
+        endif
+
+        let splitted = split(key, '-')
+        if len(splitted) >= 2
+            let sub_key = join(splitted[1:], '_')
+            let options[splitted[0]]['options'][sub_key] = value
+        else
+            let options[splitted[0]]['name'] = value
+        endif
+    endfor
 
     return [options, v:null]
 endfunction
@@ -116,3 +138,14 @@ function! s:optional_positive_number(value) abort
     return [number, v:null]
 endfunction
 
+function! s:flatten(options) abort
+    let flatten = {}
+    for [key, value] in items(a:options)
+        let flatten[key] = value.name
+        for [option_key, option_value] in items(value.options)
+            let flatten[key . '_' . option_key] = option_value
+        endfor
+    endfor
+
+    return flatten
+endfunction

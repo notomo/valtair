@@ -53,3 +53,13 @@ function! s:suite.collector()
 
     call s:assert.contains(names, '-collector=excmd')
 endfunction
+
+function! s:suite.no_duplicated_candidates()
+    let got = valtair#complete#main('', 'Valtair -arranger=hoge -arranger-max-row=1 -collector=cmd ', s:_cursor_position)
+    let names = split(got, "\n")
+
+    call s:assert.not_contains(names, '-arranger=')
+    call s:assert.not_contains(names, '-collector=')
+    call s:assert.not_contains(names, '-arranger-max-row=')
+    call s:assert.contains(names, '-arranger-max-column=')
+endfunction
